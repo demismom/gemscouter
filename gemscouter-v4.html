@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gem Scouter — Rare Handmade &amp; Vintage Finds That Speak to You</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --parchment: #f2ece0;
+  --bone: #e8e0d0;
+  --deep: #1c1710;
+  --umber: #3d2e1e;
+  --rust: #9e4a28;
+  --ochre: #b8892a;
+  --moss: #5a7052;
+  --stone: #8a8070;
+  --light: #f8f4ec;
+  --border: #d8cfc0;
+  --gem: #9e4a28;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { background:var(--light); color:var(--deep); font-family:'Jost',sans-serif; font-weight:300; overflow-x:hidden; cursor:none; }
+
+/* Cursor */
+.cursor { width:8px;height:8px;background:var(--rust);border-radius:50%;position:fixed;pointer-events:none;z-index:99999;transform:translate(-50%,-50%); }
+.cursor-ring { width:28px;height:28px;border:1px solid var(--rust);border-radius:50%;position:fixed;pointer-events:none;z-index:99998;opacity:0.5;transform:translate(-50%,-50%);transition:left 0.08s,top 0.08s; }
+
+/* Grain */
+body::after { content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:9998; }
+
+/* Logo */
+.logo-mark { display:flex;align-items:center;gap:0.7rem;text-decoration:none; }
+.logo-icon { width:32px;height:32px;flex-shrink:0; }
+.logo-wordmark { font-family:'Cormorant Garamond',serif;font-size:1.55rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--deep);line-height:1; }
+.logo-tagline { font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--stone);margin-top:0.1rem;display:block; }
+
+/* Nav */
+nav { display:flex;align-items:center;justify-content:space-between;padding:1.4rem 3rem;border-bottom:1px solid var(--border);background:var(--light);position:sticky;top:0;z-index:200; }
+.nav-center { display:flex;gap:2.5rem;list-style:none;position:absolute;left:50%;transform:translateX(-50%); }
+.nav-center a { font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--umber);text-decoration:none;padding-bottom:2px;border-bottom:1px solid transparent;transition:all 0.2s;font-weight:400; }
+.nav-center a:hover, .nav-center a.active { color:var(--rust);border-color:var(--rust); }
+.nav-right { display:flex;align-items:center;gap:1.2rem; }
+.icon-btn { background:none;border:none;cursor:none;color:var(--umber);font-size:1rem;padding:0.3rem;transition:color 0.2s;display:flex;align-items:center; }
+.icon-btn:hover { color:var(--rust); }
+.saved-count { font-size:0.65rem;background:var(--rust);color:white;border-radius:999px;padding:0.1rem 0.35rem;margin-left:0.2rem;font-weight:500; }
+.btn-join { padding:0.5rem 1.4rem;background:var(--deep);color:var(--parchment);border:none;font-family:'Jost',sans-serif;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;cursor:none;border-radius:1px;transition:background 0.2s; }
+.btn-join:hover { background:var(--rust); }
+
+/* ══ PAGE TABS ══ */
+.page-tabs { display:flex;border-bottom:1px solid var(--border);background:var(--light);padding:0 3rem; }
+.ptab { padding:1rem 1.5rem;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--stone);cursor:none;border:none;background:none;font-family:'Jost',sans-serif;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.2s;display:flex;align-items:center;gap:0.5rem; }
+.ptab:hover { color:var(--umber); }
+.ptab.active { color:var(--rust);border-bottom-color:var(--rust); }
+.ptab .tab-gem { font-size:0.75rem; }
+
+/* ══ TASTE PROFILE ONBOARDING ══ */
+.taste-page { display:none; }
+.taste-page.visible { display:block; }
+
+.taste-hero { background:var(--deep);color:var(--parchment);padding:4rem 3rem 3rem;position:relative;overflow:hidden; }
+.taste-hero::before { content:'◆';position:absolute;right:3rem;top:50%;transform:translateY(-50%);font-size:18rem;opacity:0.03;color:var(--rust);line-height:1; }
+.taste-hero-inner { max-width:600px; }
+.taste-eyebrow { font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--rust);margin-bottom:1.2rem;display:flex;align-items:center;gap:0.8rem; }
+.taste-eyebrow::before { content:'';display:block;width:24px;height:1px;background:var(--rust); }
+.taste-hero h2 { font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4vw,3.5rem);font-weight:300;line-height:1.1;margin-bottom:1rem; }
+.taste-hero h2 em { font-style:italic;color:var(--ochre); }
+.taste-hero p { font-size:0.88rem;line-height:1.85;color:rgba(242,236,224,0.65);max-width:480px; }
+
+/* Progress bar */
+.taste-progress { display:flex;align-items:center;gap:1rem;padding:1.5rem 3rem;background:var(--parchment);border-bottom:1px solid var(--border); }
+.progress-steps { display:flex;gap:0.5rem;flex:1; }
+.pstep { height:3px;flex:1;background:var(--border);border-radius:999px;transition:background 0.4s; }
+.pstep.done { background:var(--rust); }
+.pstep.active { background:var(--ochre); }
+.progress-label { font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--stone);white-space:nowrap; }
+
+/* Taste steps */
+.taste-steps-wrap { padding:3rem; }
+.taste-step { display:none; }
+.taste-step.active { display:block; }
+
+.step-header { margin-bottom:2.5rem; }
+.step-header h3 { font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:400;margin-bottom:0.4rem; }
+.step-header h3 em { font-style:italic;color:var(--rust); }
+.step-header p { font-size:0.85rem;color:var(--stone);line-height:1.6; }
+
+/* Category selector */
+.category-grid { display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2.5rem; }
+.cat-pick { border:1.5px solid var(--border);border-radius:4px;padding:1.5rem 1rem;text-align:center;cursor:none;transition:all 0.2s;background:white;display:flex;flex-direction:column;align-items:center;gap:0.7rem; }
+.cat-pick:hover { border-color:var(--stone); }
+.cat-pick.on { border-color:var(--rust);background:rgba(158,74,40,0.04); }
+.cat-pick .cp-icon { font-size:2rem;line-height:1; }
+.cat-pick .cp-name { font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--umber);font-weight:400; }
+.cat-pick .cp-check { width:18px;height:18px;border:1.5px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.55rem;color:transparent;transition:all 0.2s;margin-top:0.3rem; }
+.cat-pick.on .cp-check { background:var(--rust);border-color:var(--rust);color:white; }
+
+/* ERA TIMELINE — the visual time period filter */
+.era-timeline { position:relative;margin-bottom:3rem; }
+.era-line { position:absolute;top:38px;left:0;right:0;height:1px;background:var(--border); }
+.era-track { display:flex;justify-content:space-between;position:relative;padding-bottom:3rem; }
+.era-node { display:flex;flex-direction:column;align-items:center;gap:0.7rem;cursor:none;flex:1; }
+.era-dot { width:14px;height:14px;border-radius:50%;border:2px solid var(--border);background:white;transition:all 0.25s;position:relative;z-index:2; }
+.era-node:hover .era-dot { border-color:var(--stone); }
+.era-node.on .era-dot { background:var(--rust);border-color:var(--rust);box-shadow:0 0 0 4px rgba(158,74,40,0.15); }
+.era-node.on .era-fill { background:var(--rust); }
+.era-year { font-size:0.6rem;letter-spacing:0.1em;color:var(--stone);white-space:nowrap;margin-top:0.3rem; }
+.era-node.on .era-year { color:var(--rust); }
+.era-name { font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--umber);text-align:center;line-height:1.3;max-width:80px; }
+.era-node.on .era-name { color:var(--deep);font-weight:400; }
+.era-swatch { width:36px;height:36px;border-radius:50%;border:2px solid var(--border);overflow:hidden;transition:all 0.2s;position:relative;z-index:2; }
+.era-node.on .era-swatch { border-color:var(--rust);box-shadow:0 0 0 3px rgba(158,74,40,0.2); }
+.era-desc { font-size:0.7rem;color:var(--stone);text-align:center;max-width:90px;line-height:1.5; }
+
+/* Aesthetic mood board — visual taste picker */
+.mood-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2.5rem; }
+.mood-card { border:2px solid var(--border);border-radius:4px;overflow:hidden;cursor:none;transition:all 0.2s;position:relative; }
+.mood-card:hover { border-color:var(--stone); }
+.mood-card.on { border-color:var(--rust); }
+.mood-card.on .mood-check { opacity:1;transform:scale(1); }
+.mood-swatch { height:100px;display:flex;align-items:center;justify-content:center;font-size:2rem;position:relative; }
+.mood-check { position:absolute;top:0.5rem;right:0.5rem;width:22px;height:22px;background:var(--rust);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.6rem;opacity:0;transform:scale(0.6);transition:all 0.2s; }
+.mood-label { padding:0.7rem 0.9rem;background:white; }
+.mood-label strong { display:block;font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--umber);font-weight:400;margin-bottom:0.2rem; }
+.mood-label span { font-size:0.68rem;color:var(--stone);line-height:1.4; }
+
+/* Color palette picker */
+.palette-picker { display:flex;gap:0.8rem;flex-wrap:wrap;margin-bottom:2.5rem; }
+.pal-swatch { display:flex;flex-direction:column;align-items:center;gap:0.5rem;cursor:none; }
+.pal-circle { width:44px;height:44px;border-radius:50%;border:3px solid transparent;transition:all 0.2s; }
+.pal-swatch:hover .pal-circle { transform:scale(1.1); }
+.pal-swatch.on .pal-circle { box-shadow:0 0 0 3px white, 0 0 0 5px var(--deep); }
+.pal-name { font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--stone); }
+
+/* Describe yourself - text prompt */
+.describe-box { background:white;border:1.5px solid var(--border);border-radius:4px;padding:1.5rem;margin-bottom:2rem;transition:border-color 0.2s; }
+.describe-box:focus-within { border-color:var(--rust); }
+.describe-label { font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--stone);margin-bottom:0.8rem;display:block; }
+.describe-examples { display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.8rem; }
+.describe-eg { font-size:0.72rem;padding:0.3rem 0.8rem;border:1px solid var(--border);border-radius:999px;color:var(--stone);cursor:none;background:var(--light);transition:all 0.15s; }
+.describe-eg:hover { border-color:var(--rust);color:var(--rust); }
+.describe-input { width:100%;border:none;background:none;font-family:'Jost',sans-serif;font-size:0.9rem;font-weight:300;color:var(--deep);outline:none;resize:none;line-height:1.7;min-height:60px; }
+.describe-input::placeholder { color:var(--border); }
+
+/* Reference items picker */
+.ref-grid { display:grid;grid-template-columns:repeat(5,1fr);gap:0.8rem;margin-bottom:2rem; }
+.ref-item { aspect-ratio:1;border:2px solid var(--border);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;cursor:none;transition:all 0.2s;position:relative;background:white; }
+.ref-item:hover { border-color:var(--stone); }
+.ref-item.on { border-color:var(--rust);background:rgba(158,74,40,0.03); }
+.ref-item .ri-check { position:absolute;top:0.3rem;right:0.3rem;width:16px;height:16px;background:var(--rust);border-radius:50%;color:white;font-size:0.55rem;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s; }
+.ref-item.on .ri-check { opacity:1; }
+.ref-bg { width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.6rem; }
+
+/* Step nav */
+.step-nav { display:flex;justify-content:space-between;align-items:center;padding-top:1.5rem;border-top:1px solid var(--border); }
+.btn-back { background:none;border:none;font-family:'Jost',sans-serif;font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--stone);cursor:none;padding:0.7rem 0;transition:color 0.2s; }
+.btn-back:hover { color:var(--umber); }
+.btn-next { padding:0.85rem 2.5rem;background:var(--deep);color:var(--parchment);border:none;font-family:'Jost',sans-serif;font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;cursor:none;border-radius:1px;transition:background 0.2s; }
+.btn-next:hover { background:var(--rust); }
+.step-hint { font-size:0.7rem;color:var(--stone);font-style:italic; }
+
+/* ══ SCOUT PROFILE PANEL ══ */
+.profile-page { display:none; }
+.profile-page.visible { display:block; }
+
+.profile-layout { display:grid;grid-template-columns:300px 1fr;min-height:80vh; }
+
+.profile-sidebar { border-right:1px solid var(--border);padding:2.5rem 2rem;background:white; }
+.profile-avatar { width:64px;height:64px;background:var(--deep);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:1.2rem;font-size:1.5rem; }
+.profile-name { font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;margin-bottom:0.2rem; }
+.profile-since { font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--stone); }
+
+.profile-section { margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border); }
+.profile-section-title { font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--stone);margin-bottom:1rem; }
+
+/* Taste DNA bars */
+.dna-bar { margin-bottom:0.9rem; }
+.dna-label { display:flex;justify-content:space-between;margin-bottom:0.35rem; }
+.dna-name { font-size:0.72rem;color:var(--umber); }
+.dna-pct { font-size:0.65rem;color:var(--stone); }
+.dna-track { height:4px;background:var(--bone);border-radius:999px;overflow:hidden; }
+.dna-fill { height:100%;background:var(--rust);border-radius:999px;transition:width 1s ease; }
+
+/* Profile tags */
+.profile-tags { display:flex;flex-wrap:wrap;gap:0.4rem; }
+.ptag { font-size:0.65rem;padding:0.3rem 0.7rem;background:var(--parchment);border-radius:999px;color:var(--umber);letter-spacing:0.06em; }
+.ptag.strong { background:var(--rust);color:white; }
+
+/* Profile eras */
+.era-chips { display:flex;flex-direction:column;gap:0.5rem; }
+.era-chip { display:flex;align-items:center;gap:0.8rem;padding:0.6rem 0.8rem;border:1px solid var(--border);border-radius:3px;background:var(--light); }
+.era-chip-dot { width:10px;height:10px;border-radius:50%;background:var(--rust);flex-shrink:0; }
+.era-chip-label { font-size:0.72rem;color:var(--umber); }
+
+/* Profile main area */
+.profile-main { padding:2.5rem 3rem; }
+.profile-main-title { font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:400;margin-bottom:0.3rem; }
+.profile-main-sub { font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--stone);margin-bottom:2rem; }
+
+/* Scouted for you grid */
+.scouted-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:3rem; }
+.scout-card { border:1px solid var(--border);border-radius:3px;background:white;overflow:hidden;cursor:none;transition:all 0.2s;position:relative; }
+.scout-card:hover { box-shadow:0 10px 30px rgba(28,23,16,0.1);transform:translateY(-3px); }
+.scout-card:hover .sc-save { opacity:1;transform:scale(1); }
+.sc-thumb { aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:2rem;position:relative; }
+.sc-thumb::after { content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(28,23,16,0.25) 0%,transparent 50%);opacity:0;transition:opacity 0.3s; }
+.scout-card:hover .sc-thumb::after { opacity:1; }
+.sc-match { position:absolute;top:0.6rem;left:0.6rem;background:var(--rust);color:white;font-size:0.58rem;letter-spacing:0.1em;padding:0.2rem 0.55rem;border-radius:999px;z-index:2;font-weight:400; }
+.sc-save { position:absolute;top:0.6rem;right:0.6rem;width:28px;height:28px;background:white;border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;opacity:0;transform:scale(0.7);transition:all 0.2s;cursor:none;z-index:2;color:var(--stone); }
+.sc-why { position:absolute;bottom:0.6rem;left:0.6rem;right:0.6rem;font-size:0.6rem;color:rgba(255,255,255,0.9);letter-spacing:0.06em;z-index:2;opacity:0;transition:opacity 0.3s;line-height:1.4; }
+.scout-card:hover .sc-why { opacity:1; }
+.sc-body { padding:0.9rem 1rem 1rem; }
+.sc-title { font-family:'Cormorant Garamond',serif;font-size:0.95rem;font-weight:400;margin-bottom:0.25rem; }
+.sc-meta { font-size:0.65rem;color:var(--stone);margin-bottom:0.6rem; }
+.sc-footer { display:flex;justify-content:space-between;align-items:center; }
+.sc-price { font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600; }
+.sc-src { font-size:0.58rem;padding:0.18rem 0.5rem;border-radius:1px;font-weight:500;letter-spacing:0.06em; }
+.badge-etsy { background:#f1641e;color:white; }
+.badge-estate { background:var(--moss);color:white; }
+.badge-auction { background:var(--ochre);color:#1c1710; }
+.badge-fb { background:#1877f2;color:white; }
+.badge-ebay { background:var(--umber);color:white; }
+
+/* Category taste sections */
+.cat-taste-section { margin-bottom:3rem;padding-bottom:2.5rem;border-bottom:1px solid var(--border); }
+.cts-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem; }
+.cts-title { display:flex;align-items:center;gap:0.8rem; }
+.cts-icon { font-size:1.2rem; }
+.cts-name { font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:400; }
+.cts-sub { font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--stone); }
+.cts-edit { font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--rust);border:none;background:none;cursor:none;font-family:'Jost',sans-serif;border-bottom:1px solid var(--rust);padding-bottom:1px; }
+
+/* ══ DISCOVER PAGE (main) ══ */
+.discover-page { display:none; }
+.discover-page.visible { display:block; }
+
+/* Hero */
+.hero { min-height:82vh;display:grid;grid-template-columns:1fr 1fr;position:relative;overflow:hidden; }
+.hero-left { padding:6rem 4rem 5rem 3rem;display:flex;flex-direction:column;justify-content:center;border-right:1px solid var(--border); }
+.hero-eyebrow { font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--rust);margin-bottom:1.8rem;display:flex;align-items:center;gap:0.8rem; }
+.hero-eyebrow::before { content:'';display:block;width:30px;height:1px;background:var(--rust); }
+.hero-title { font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,5vw,5.5rem);font-weight:300;line-height:1.05;margin-bottom:2rem; }
+.hero-title em { font-style:italic;color:var(--rust); }
+.hero-body { font-size:0.9rem;line-height:1.85;color:var(--stone);max-width:380px;margin-bottom:2.5rem; }
+.hero-cta { display:flex;gap:1rem;align-items:center; }
+.btn-main { padding:0.9rem 2.4rem;background:var(--rust);color:white;border:none;font-family:'Jost',sans-serif;font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;cursor:none;border-radius:1px;transition:opacity 0.2s; }
+.btn-main:hover { opacity:0.85; }
+.btn-ghost { font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--umber);background:none;border:none;cursor:none;padding-bottom:2px;border-bottom:1px solid var(--border);transition:all 0.2s; }
+.btn-ghost:hover { color:var(--rust);border-color:var(--rust); }
+.source-list { margin-top:3rem;padding-top:2rem;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center; }
+.source-label { font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--stone);margin-right:0.5rem; }
+.src-pill { font-size:0.65rem;letter-spacing:0.08em;padding:0.25rem 0.75rem;border:1px solid var(--border);border-radius:999px;color:var(--umber);background:white; }
+.hero-right { display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto auto; }
+.cat-cell { border-right:1px solid var(--border);border-bottom:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.6rem;padding:1.5rem;transition:background 0.25s;cursor:none;overflow:hidden; }
+.cat-cell:nth-child(even) { border-right:none; }
+.cat-cell:nth-child(5),.cat-cell:nth-child(6) { border-bottom:none; }
+.cat-cell:hover { background:var(--parchment); }
+.cat-cell:hover .cat-icon { transform:scale(1.1); }
+.cat-icon { font-size:1.8rem;transition:transform 0.2s;line-height:1; }
+.cat-name { font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--umber);text-align:center;font-weight:400; }
+.cat-count { font-size:0.58rem;color:var(--stone);letter-spacing:0.1em; }
+.cat-cell.featured { background:var(--deep);grid-column:span 2;flex-direction:row;justify-content:space-between;padding:2rem 2.5rem;border-bottom:none; }
+.cat-cell.featured .cat-name { color:var(--parchment);font-size:0.8rem; }
+.cat-cell.featured .cat-count { color:var(--stone); }
+.cat-cell.featured .cat-icon { font-size:2.2rem; }
+.cat-cell.featured:hover { background:var(--umber); }
+.featured-text { display:flex;flex-direction:column;gap:0.4rem; }
+.featured-badge { font-size:0.55rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--ochre); }
+
+/* Marquee */
+.marquee-strip { background:var(--deep);color:var(--parchment);padding:0.9rem 0;overflow:hidden;white-space:nowrap; }
+.marquee-track { display:inline-flex;gap:3rem;animation:marquee 28s linear infinite;font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(242,236,224,0.6); }
+.marquee-track span { display:inline-flex;align-items:center;gap:1.5rem; }
+.marquee-track span::after { content:'✦';color:var(--rust);font-size:0.5rem; }
+@keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+/* ══ COMBINED SEARCH + ERA FILTER ══ */
+.search-era-wrap { background:var(--parchment);border-bottom:1px solid var(--border);padding:2rem 3rem; }
+.search-era-inner { max-width:1200px;margin:0 auto; }
+.search-top { display:flex;gap:0.8rem;margin-bottom:1.5rem; }
+.search-field { flex:1;display:flex;align-items:center;background:white;border:1px solid var(--border);border-radius:1px;padding:0 1.2rem;gap:0.8rem; }
+.search-field input { flex:1;padding:0.9rem 0;border:none;background:none;font-family:'Jost',sans-serif;font-size:0.9rem;font-weight:300;color:var(--deep);outline:none; }
+.search-field input::placeholder { color:var(--stone); }
+.search-go { padding:0 2.5rem;background:var(--deep);color:var(--parchment);border:none;font-family:'Jost',sans-serif;font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;cursor:none;border-radius:1px;white-space:nowrap;transition:background 0.2s; }
+.search-go:hover { background:var(--rust); }
+
+/* FILTER ROW with era embedded */
+.filter-row { display:flex;gap:0.8rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:1.2rem; }
+.filter-unit { display:flex;flex-direction:column;gap:0.35rem;flex:1;min-width:120px; }
+.filter-unit label { font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--stone); }
+.filter-unit select { padding:0.65rem 2rem 0.65rem 0.9rem;border:1px solid var(--border);background:white;font-family:'Jost',sans-serif;font-size:0.82rem;font-weight:300;color:var(--deep);border-radius:1px;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='10' height='5' viewBox='0 0 10 5' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l5 5 5-5z' fill='%238a8070'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 0.7rem center;cursor:none;outline:none;transition:border-color 0.2s; }
+.filter-unit select:focus { border-color:var(--rust); }
+
+/* Era as inline visual timeline inside filter bar */
+.era-filter-unit { flex:2;min-width:280px; }
+.era-mini-track { display:flex;align-items:center;gap:0;background:white;border:1px solid var(--border);border-radius:1px;overflow:hidden;height:42px; }
+.era-mini-btn { flex:1;height:100%;border:none;background:none;font-family:'Jost',sans-serif;font-size:0.62rem;letter-spacing:0.06em;color:var(--stone);cursor:none;transition:all 0.15s;border-right:1px solid var(--border);padding:0 0.3rem;white-space:nowrap;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px; }
+.era-mini-btn:last-child { border-right:none; }
+.era-mini-btn:hover { background:var(--parchment);color:var(--umber); }
+.era-mini-btn.on { background:var(--deep);color:var(--parchment); }
+.era-mini-year { font-size:0.55rem;opacity:0.6; }
+
+/* Color dots */
+.color-unit { flex:0 0 auto; }
+.color-dots { display:flex;gap:0.35rem;padding:0.55rem 0.7rem;background:white;border:1px solid var(--border);border-radius:1px;flex-wrap:wrap;max-width:240px; }
+.cdot { width:22px;height:22px;border-radius:50%;cursor:none;border:2px solid transparent;transition:transform 0.15s,box-shadow 0.15s;flex-shrink:0; }
+.cdot:hover { transform:scale(1.2); }
+.cdot.on { box-shadow:0 0 0 2px white,0 0 0 3.5px var(--deep); }
+
+/* Type toggle */
+.auth-toggle { flex:0 0 auto; }
+.toggle-row { display:flex;background:white;border:1px solid var(--border);border-radius:1px;overflow:hidden; }
+.tog { padding:0.65rem 1rem;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;cursor:none;border:none;background:none;color:var(--stone);transition:all 0.15s;white-space:nowrap;font-family:'Jost',sans-serif; }
+.tog.active { background:var(--deep);color:var(--parchment); }
+
+/* Taste bar */
+.taste-bar { padding:1.2rem 3rem;border-bottom:1px solid var(--border);background:var(--light); }
+.taste-inner { max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:0.8rem;flex-wrap:wrap; }
+.taste-label { font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--stone);white-space:nowrap;flex-shrink:0; }
+.taste-profile-btn { font-size:0.65rem;padding:0.35rem 0.9rem;background:rgba(158,74,40,0.08);border:1px solid rgba(158,74,40,0.3);border-radius:999px;color:var(--rust);cursor:none;letter-spacing:0.06em;font-family:'Jost',sans-serif;transition:all 0.15s;white-space:nowrap; }
+.taste-profile-btn:hover { background:var(--rust);color:white;border-color:var(--rust); }
+.ttag { padding:0.35rem 0.9rem;border:1px solid var(--border);border-radius:999px;font-size:0.7rem;letter-spacing:0.06em;cursor:none;background:white;color:var(--umber);transition:all 0.15s;font-family:'Jost',sans-serif;font-weight:300; }
+.ttag:hover { border-color:var(--rust);color:var(--rust); }
+.ttag.on { background:var(--rust);color:white;border-color:var(--rust); }
+
+/* Results */
+.results-section { max-width:1200px;margin:0 auto;padding:2.5rem 3rem 5rem; }
+.results-bar { display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;padding-bottom:1.2rem;border-bottom:1px solid var(--border); }
+.results-count { font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:300;font-style:italic;color:var(--deep); }
+.results-sub { font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--stone);margin-top:0.15rem; }
+.sort-row { display:flex;gap:1.5rem;align-items:center; }
+.sort-lbl { font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--stone); }
+.sopt { font-size:0.7rem;letter-spacing:0.08em;color:var(--stone);cursor:none;padding-bottom:1px;border:none;border-bottom:1px solid transparent;transition:all 0.15s;background:none;font-family:'Jost',sans-serif; }
+.sopt:hover,.sopt.on { color:var(--rust);border-bottom-color:var(--rust); }
+.grid { display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem; }
+.card { background:white;border:1px solid var(--border);border-radius:2px;overflow:hidden;cursor:none;position:relative;transition:box-shadow 0.25s,transform 0.25s; }
+.card:hover { box-shadow:0 16px 40px rgba(28,23,16,0.12);transform:translateY(-4px); }
+.card:hover .save-btn { opacity:1;transform:scale(1); }
+.card:hover .card-img-wrap::after { opacity:1; }
+.card-img-wrap { position:relative;aspect-ratio:1;overflow:hidden; }
+.card-img-wrap::after { content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(28,23,16,0.3) 0%,transparent 50%);opacity:0;transition:opacity 0.3s; }
+.card-thumb { width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:2.5rem; }
+.save-btn { position:absolute;top:0.7rem;right:0.7rem;width:32px;height:32px;background:white;border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(0.8);transition:opacity 0.2s,transform 0.2s;cursor:none;z-index:3;box-shadow:0 2px 8px rgba(0,0,0,0.15);font-size:0.85rem;color:var(--stone); }
+.save-btn.saved { opacity:1;transform:scale(1);color:var(--rust); }
+.src-badge { position:absolute;bottom:0.6rem;left:0.6rem;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.2rem 0.5rem;border-radius:1px;z-index:3;font-weight:500; }
+.verify-dot { position:absolute;top:0.7rem;left:0.7rem;width:8px;height:8px;background:var(--moss);border-radius:50%;z-index:3;box-shadow:0 0 0 2px white; }
+.card-body { padding:1rem 1.1rem 1.1rem; }
+.card-title { font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:400;color:var(--deep);margin-bottom:0.3rem;line-height:1.3; }
+.card-meta { font-size:0.68rem;color:var(--stone);letter-spacing:0.05em;margin-bottom:0.7rem;display:flex;align-items:center;gap:0.4rem; }
+.meta-dot { width:3px;height:3px;background:var(--border);border-radius:50%; }
+.card-footer { display:flex;align-items:flex-end;justify-content:space-between; }
+.card-price { font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;line-height:1; }
+.bid-label { display:block;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--rust);font-family:'Jost',sans-serif;margin-top:0.15rem; }
+.card-mtags { display:flex;gap:0.3rem;flex-wrap:wrap;justify-content:flex-end; }
+.mtag { font-size:0.6rem;padding:0.15rem 0.45rem;background:var(--parchment);border-radius:999px;color:var(--stone);letter-spacing:0.06em; }
+
+/* Identity */
+.identity { padding:5rem 3rem;display:grid;grid-template-columns:1fr 1fr;gap:6rem;max-width:1200px;margin:0 auto;align-items:center; }
+.identity-text h2 { font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,3.5vw,3.2rem);font-weight:300;line-height:1.2;margin-bottom:1.5rem; }
+.identity-text h2 em { font-style:italic;color:var(--rust); }
+.identity-text p { font-size:0.88rem;line-height:1.9;color:var(--stone);margin-bottom:1rem; }
+.pledge-list { margin-top:2rem;display:flex;flex-direction:column;gap:0.8rem; }
+.pledge { display:flex;align-items:flex-start;gap:1rem;font-size:0.82rem;color:var(--umber);line-height:1.5; }
+.pledge-icon { width:20px;height:20px;background:var(--rust);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.6rem;flex-shrink:0;margin-top:0.1rem; }
+.identity-visual { display:grid;grid-template-columns:1fr 1fr;gap:1rem; }
+.id-block { border:1px solid var(--border);padding:1.5rem;border-radius:2px;background:white;display:flex;flex-direction:column;gap:0.5rem; }
+.id-block:first-child { grid-column:span 2;background:var(--parchment);flex-direction:row;align-items:center;gap:1.5rem; }
+.id-num { font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:300;color:var(--rust);line-height:1; }
+.id-label { font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--stone); }
+.id-desc { font-size:0.8rem;color:var(--umber);line-height:1.5; }
+
+/* Footer */
+footer { background:var(--deep);color:var(--parchment);padding:3rem;display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:3rem; }
+.footer-brand .logo-wordmark { color:var(--parchment);font-size:1.3rem; }
+.footer-brand .logo-tagline { color:var(--stone); }
+.footer-brand p { margin-top:1rem;font-size:0.78rem;line-height:1.7;color:rgba(242,236,224,0.5);max-width:240px; }
+.footer-col h4 { font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--stone);margin-bottom:1.2rem; }
+.footer-col ul { list-style:none;display:flex;flex-direction:column;gap:0.7rem; }
+.footer-col a { font-size:0.8rem;color:rgba(242,236,224,0.55);text-decoration:none;transition:color 0.15s; }
+.footer-col a:hover { color:var(--parchment); }
+.footer-bottom { background:var(--deep);padding:1.2rem 3rem;border-top:1px solid rgba(255,255,255,0.05);display:flex;justify-content:space-between;align-items:center;font-size:0.65rem;color:rgba(242,236,224,0.3);letter-spacing:0.1em; }
+
+/* Animations */
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+.hero-eyebrow { animation:fadeUp 0.6s ease both; }
+.hero-title { animation:fadeUp 0.6s 0.1s ease both; }
+.hero-body { animation:fadeUp 0.6s 0.2s ease both; }
+.hero-cta { animation:fadeUp 0.6s 0.3s ease both; }
+.source-list { animation:fadeUp 0.6s 0.4s ease both; }
+.card { animation:fadeUp 0.5s ease both; }
+.card:nth-child(1){animation-delay:0.05s}
+.card:nth-child(2){animation-delay:0.1s}
+.card:nth-child(3){animation-delay:0.15s}
+.card:nth-child(4){animation-delay:0.2s}
+.card:nth-child(5){animation-delay:0.25s}
+.card:nth-child(6){animation-delay:0.3s}
+.card:nth-child(7){animation-delay:0.35s}
+.card:nth-child(8){animation-delay:0.4s}
+
+@media(max-width:1024px) {
+  .hero{grid-template-columns:1fr;min-height:auto}
+  .hero-right{display:none}
+  .grid{grid-template-columns:repeat(2,1fr)}
+  footer{grid-template-columns:1fr 1fr}
+  .identity{grid-template-columns:1fr;gap:3rem}
+  nav{padding:1.2rem 1.5rem}
+  .nav-center{display:none}
+  .profile-layout{grid-template-columns:1fr}
+  .profile-sidebar{border-right:none;border-bottom:1px solid var(--border)}
+  .scouted-grid{grid-template-columns:repeat(2,1fr)}
+  .category-grid{grid-template-columns:repeat(2,1fr)}
+  .mood-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="ring"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo-mark" onclick="showPage('discover');return false;">
+    <svg class="logo-icon" viewBox="0 0 32 32" fill="none">
+      <polygon points="16,2 28,10 28,22 16,30 4,22 4,10" stroke="#1c1710" stroke-width="1" fill="none"/>
+      <polygon points="16,2 28,10 16,14 4,10" stroke="#9e4a28" stroke-width="0.8" fill="none"/>
+      <line x1="16" y1="14" x2="16" y2="30" stroke="#9e4a28" stroke-width="0.8"/>
+      <line x1="16" y1="14" x2="4" y2="22" stroke="#1c1710" stroke-width="0.5" opacity="0.4"/>
+      <line x1="16" y1="14" x2="28" y2="22" stroke="#1c1710" stroke-width="0.5" opacity="0.4"/>
+    </svg>
+    <div>
+      <span class="logo-wordmark">Gem Scouter</span>
+      <span class="logo-tagline">Rare finds that speak to you</span>
+    </div>
+  </a>
+  <ul class="nav-center">
+    <li><a href="#" class="active" onclick="showPage('discover');return false;">Discover</a></li>
+    <li><a href="#" onclick="showPage('profile');return false;">My Scout Profile</a></li>
+    <li><a href="#">Collections</a></li>
+    <li><a href="#">Alerts</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="icon-btn">♡ <span class="saved-count">8</span></button>
+    <button class="btn-join" onclick="showPage('taste');return false;">Build My Taste Profile</button>
+  </div>
+</nav>
+
+<!-- PAGE TABS -->
+<div class="page-tabs">
+  <button class="ptab active" id="tab-discover" onclick="showPage('discover')"><span class="tab-gem">◆</span> Discover</button>
+  <button class="ptab" id="tab-taste" onclick="showPage('taste')"><span class="tab-gem">◇</span> Build Taste Profile</button>
+  <button class="ptab" id="tab-profile" onclick="showPage('profile')"><span class="tab-gem">✦</span> My Scout Profile</button>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- TASTE PROFILE ONBOARDING                  -->
+<!-- ══════════════════════════════════════════ -->
+<div class="taste-page" id="page-taste">
+
+  <div class="taste-hero">
+    <div class="taste-hero-inner">
+      <div class="taste-eyebrow">Your Scout Profile</div>
+      <h2>Tell us what <em>moves</em> you.</h2>
+      <p>Answer a few questions and we'll scout finds matched specifically to your taste — across art, watches, ceramics, jewelry, and more. Price never ranks results here. A $28 find can be just as extraordinary as a $480 one.</p>
+    </div>
+  </div>
+
+  <div class="taste-progress">
+    <div class="progress-steps">
+      <div class="pstep active" id="ps1"></div>
+      <div class="pstep" id="ps2"></div>
+      <div class="pstep" id="ps3"></div>
+      <div class="pstep" id="ps4"></div>
+      <div class="pstep" id="ps5"></div>
+    </div>
+    <span class="progress-label" id="progress-label">Step 1 of 5</span>
+  </div>
+
+  <div class="taste-steps-wrap">
+
+    <!-- STEP 1: Categories -->
+    <div class="taste-step active" id="ts1">
+      <div class="step-header">
+        <h3>What do you <em>collect?</em></h3>
+        <p>Select every category that interests you. We'll tailor your taste profile for each one separately.</p>
+      </div>
+      <div class="category-grid">
+        <div class="cat-pick on" onclick="this.classList.toggle('on')">
+          <div class="cp-icon">🖼</div>
+          <div class="cp-name">Paintings & Original Art</div>
+          <div class="cp-check">✓</div>
+        </div>
+        <div class="cat-pick" onclick="this.classList.toggle('on')">
+          <div class="cp-icon">🏺</div>
+          <div class="cp-name">Ceramics & Pottery</div>
+          <div class="cp-check">✓</div>
+        </div>
+        <div class="cat-pick on" onclick="this.classList.toggle('on')">
+          <div class="cp-icon">⌚</div>
+          <div class="cp-name">Watches & Timepieces</div>
+          <div class="cp-check">✓</div>
+        </div>
+        <div class="cat-pick" onclick="this.classList.toggle('on')">
+          <div class="cp-icon">💍</div>
+          <div class="cp-name">Jewelry & Accessories</div>
+          <div class="cp-check">✓</div>
+        </div>
+        <div class="cat-pick" onclick="this.classList.toggle('on')">
+          <div class="cp-icon">🧶</div>
+          <div class="cp-name">Textiles & Fiber Arts</div>
+          <div class="cp-check">✓</div>
+        </div>
+        <div class="cat-pick" onclick="this.classList.toggle('on')">
+          <div class="cp-icon">🗿</div>
+          <div class="cp-name">Sculpture & Objects</div>
+          <div class="cp-check">✓</div>
+        </div>
+        <div class="cat-pick" onclick="this.classList.toggle('on')">
+          <div class="cp-icon">🪑</div>
+          <div class="cp-name">Furniture & Decor</div>
+          <div class="cp-check">✓</div>
+        </div>
+        <div class="cat-pick" onclick="this.classList.toggle('on')">
+          <div class="cp-icon">📷</div>
+          <div class="cp-name">Photography</div>
+          <div class="cp-check">✓</div>
+        </div>
+      </div>
+      <div class="step-nav">
+        <span class="step-hint">Select all that interest you</span>
+        <button class="btn-next" onclick="goStep(2)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Era / Time Period -->
+    <div class="taste-step" id="ts2">
+      <div class="step-header">
+        <h3>Which <em>eras</em> speak to you?</h3>
+        <p>Select the periods that resonate — or pick multiple. This shapes the time-period filter across all your results.</p>
+      </div>
+
+      <div class="era-timeline">
+        <div class="era-line"></div>
+        <div class="era-track">
+
+          <div class="era-node" onclick="this.classList.toggle('on')">
+            <div class="era-swatch" style="background:linear-gradient(135deg,#8b6914,#c9a84c,#e8d5b7)"></div>
+            <div class="era-dot"></div>
+            <div class="era-year">pre-1900</div>
+            <div class="era-name">Antique & Victorian</div>
+            <div class="era-desc">ornate, gilded, heavily crafted</div>
+          </div>
+
+          <div class="era-node on" onclick="this.classList.toggle('on')">
+            <div class="era-swatch" style="background:linear-gradient(135deg,#1c1710,#b8892a,#e8d5a0)"></div>
+            <div class="era-dot"></div>
+            <div class="era-year">1900–1940</div>
+            <div class="era-name">Art Nouveau & Deco</div>
+            <div class="era-desc">flowing lines, geometric glamour</div>
+          </div>
+
+          <div class="era-node on" onclick="this.classList.toggle('on')">
+            <div class="era-swatch" style="background:linear-gradient(135deg,#2d4a27,#d4a574,#f2ece0)"></div>
+            <div class="era-dot"></div>
+            <div class="era-year">1945–1970</div>
+            <div class="era-name">Mid-Century</div>
+            <div class="era-desc">clean lines, organic form</div>
+          </div>
+
+          <div class="era-node" onclick="this.classList.toggle('on')">
+            <div class="era-swatch" style="background:linear-gradient(135deg,#3a3530,#9b7fa6,#e8c0c0)"></div>
+            <div class="era-dot"></div>
+            <div class="era-year">1970–1990</div>
+            <div class="era-name">Late Modern</div>
+            <div class="era-desc">bold, experimental, postmodern</div>
+          </div>
+
+          <div class="era-node" onclick="this.classList.toggle('on')">
+            <div class="era-swatch" style="background:linear-gradient(135deg,#5a7052,#d4a574,#1c1710)"></div>
+            <div class="era-dot"></div>
+            <div class="era-year">1990–now</div>
+            <div class="era-name">Contemporary Handmade</div>
+            <div class="era-desc">alive today, made by hand</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(1)">← Back</button>
+        <button class="btn-next" onclick="goStep(3)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Aesthetic mood -->
+    <div class="taste-step" id="ts3">
+      <div class="step-header">
+        <h3>What's your <em>aesthetic?</em></h3>
+        <p>Pick the moods that feel like your space, your style, your eye. These become your taste signature.</p>
+      </div>
+      <div class="mood-grid">
+        <div class="mood-card on" onclick="this.classList.toggle('on')">
+          <div class="mood-swatch" style="background:linear-gradient(135deg,#d4a574,#8b6040,#3a2010)">
+            <span class="mood-check">✓</span>
+          </div>
+          <div class="mood-label"><strong>Wabi-sabi</strong><span>Imperfect, aged, quiet beauty. Cracks are the point.</span></div>
+        </div>
+        <div class="mood-card" onclick="this.classList.toggle('on')">
+          <div class="mood-swatch" style="background:linear-gradient(135deg,#1c1710,#2d2d2d,#b8892a)">
+            <span class="mood-check">✓</span>
+          </div>
+          <div class="mood-label"><strong>Dark Academia</strong><span>Libraries, leather, candlelight. Intellectually beautiful.</span></div>
+        </div>
+        <div class="mood-card on" onclick="this.classList.toggle('on')">
+          <div class="mood-swatch" style="background:linear-gradient(135deg,#f2ece0,#d4a574,#5a7052)">
+            <span class="mood-check">✓</span>
+          </div>
+          <div class="mood-label"><strong>Japandi</strong><span>Japanese minimalism meets Scandinavian warmth.</span></div>
+        </div>
+        <div class="mood-card" onclick="this.classList.toggle('on')">
+          <div class="mood-swatch" style="background:linear-gradient(135deg,#7a4a8a,#c090d0,#e8d5f0)">
+            <span class="mood-check">✓</span>
+          </div>
+          <div class="mood-label"><strong>Cottagecore</strong><span>Wildflowers, folk art, handmade softness.</span></div>
+        </div>
+        <div class="mood-card" onclick="this.classList.toggle('on')">
+          <div class="mood-swatch" style="background:linear-gradient(135deg,#2c2c2c,#5a5a5a,#9e4a28)">
+            <span class="mood-check">✓</span>
+          </div>
+          <div class="mood-label"><strong>Industrial</strong><span>Raw materials, brutalist forms, earned patina.</span></div>
+        </div>
+        <div class="mood-card" onclick="this.classList.toggle('on')">
+          <div class="mood-swatch" style="background:linear-gradient(135deg,#1c1710,#b8892a,#e8d5a0)">
+            <span class="mood-check">✓</span>
+          </div>
+          <div class="mood-label"><strong>Art Deco</strong><span>Geometry, gold, glamour. The jazz age in objects.</span></div>
+        </div>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(2)">← Back</button>
+        <button class="btn-next" onclick="goStep(4)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Color palette -->
+    <div class="taste-step" id="ts4">
+      <div class="step-header">
+        <h3>What <em>palette</em> draws you?</h3>
+        <p>Pick the colors you naturally reach for. We use this to surface pieces that match the feeling of your space.</p>
+      </div>
+      <div class="palette-picker">
+        <div class="pal-swatch on" onclick="this.classList.toggle('on')"><div class="pal-circle" style="background:#d4a574"></div><div class="pal-name">Sand</div></div>
+        <div class="pal-swatch on" onclick="this.classList.toggle('on')"><div class="pal-circle" style="background:#9e4a28"></div><div class="pal-name">Rust</div></div>
+        <div class="pal-swatch" onclick="this.classList.toggle('on')"><div class="pal-circle" style="background:#6b3a2a"></div><div class="pal-name">Sienna</div></div>
+        <div class="pal-swatch on" onclick="this.classList.toggle('on')"><div class="pal-circle" style="background:#5a7052"></div><div class="pal-name">Moss</div></div>
+        <div class="pal-swatch" onclick="this.classList.toggle('on')"><div class="pal-circle" style="background:#2d4a27"></div><div class="pal-name">Forest</div></div>
+        <div class="pal-swatch" onclick="this.classList.toggle('on')"><div class="pal-circle" style="background:#4a6fa5"></div><div class="pal-name">Indigo</div></div>
+        <div class="pal-swatch" onclick="this.classList.toggle('on')"><div class="pal-circle" style="background:#1c1710"></div><div class="pal-name">Ebony</div></div>
+        <div class="pal-swatch on" onclick="this.classList.toggle('on')"><div class="pal-circle" style="background:#b8892a"></div><div class="pal-name">Ochre</div></div>
+        <div class="pal-swatch" onclick="this.classList.toggle('on')"><div class="pal-circle" style="background:#9b7fa6"></div><div class="pal-name">Lavender</div></div>
+        <div class="pal-swatch" onclick="this.classList.toggle('on')"><div class="pal-circle" style="background:#d4515a"></div><div class="pal-name">Crimson</div></div>
+        <div class="pal-swatch" onclick="this.classList.toggle('on')"><div class="pal-circle" style="background:#e8e0d0"></div><div class="pal-name">Bone</div></div>
+        <div class="pal-swatch" onclick="this.classList.toggle('on')"><div class="pal-circle" style="background:#3a3530"></div><div class="pal-name">Charcoal</div></div>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(3)">← Back</button>
+        <button class="btn-next" onclick="goStep(5)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: Describe yourself + reference picks -->
+    <div class="taste-step" id="ts5">
+      <div class="step-header">
+        <h3>Describe what <em>moves</em> you.</h3>
+        <p>Use your own words — artists you love, objects you own, places that inspire. The more specific, the better your matches.</p>
+      </div>
+
+      <div class="describe-box">
+        <span class="describe-label">Tell us in your own words</span>
+        <div class="describe-examples">
+          <span class="describe-eg" onclick="fillExample(this)">"I love early Cy Twombly, anything gestural"</span>
+          <span class="describe-eg" onclick="fillExample(this)">"Vintage Swiss dress watches, clean dials"</span>
+          <span class="describe-eg" onclick="fillExample(this)">"Folk pottery with visible throwing marks"</span>
+          <span class="describe-eg" onclick="fillExample(this)">"Japanese mingei, simple and functional"</span>
+          <span class="describe-eg" onclick="fillExample(this)">"Abstract expressionism, raw and physical"</span>
+        </div>
+        <textarea class="describe-input" id="describeText" placeholder="e.g. I'm drawn to abstract paintings with earthy tones, gestural marks, and visible brushwork. For watches I love clean Swiss dress watches from the 1960s — nothing too sporty..."></textarea>
+      </div>
+
+      <div class="step-header" style="margin-top:1.5rem">
+        <h3 style="font-size:1.3rem">Pick pieces that <em>feel right.</em></h3>
+        <p>Tap anything that resonates — even slightly. This trains your taste fingerprint.</p>
+      </div>
+
+      <div class="ref-grid">
+        <div class="ref-item on" onclick="this.classList.toggle('on')"><div class="ref-bg" style="background:linear-gradient(135deg,#d4a574,#9e4a28)">🖼</div><div class="ri-check">✓</div></div>
+        <div class="ref-item" onclick="this.classList.toggle('on')"><div class="ref-bg" style="background:linear-gradient(135deg,#1c1710,#b8892a)">⌚</div><div class="ri-check">✓</div></div>
+        <div class="ref-item on" onclick="this.classList.toggle('on')"><div class="ref-bg" style="background:linear-gradient(135deg,#5a7052,#d4a574)">🏺</div><div class="ri-check">✓</div></div>
+        <div class="ref-item" onclick="this.classList.toggle('on')"><div class="ref-bg" style="background:linear-gradient(135deg,#2d4a27,#c9d8ca)">🌿</div><div class="ri-check">✓</div></div>
+        <div class="ref-item" onclick="this.classList.toggle('on')"><div class="ref-bg" style="background:linear-gradient(135deg,#7a4a8a,#e8d5f0)">💎</div><div class="ri-check">✓</div></div>
+        <div class="ref-item" onclick="this.classList.toggle('on')"><div class="ref-bg" style="background:linear-gradient(135deg,#3a3530,#8a8a8a)">🗿</div><div class="ri-check">✓</div></div>
+        <div class="ref-item on" onclick="this.classList.toggle('on')"><div class="ref-bg" style="background:linear-gradient(135deg,#1c1710,#d4a574)">🖌</div><div class="ri-check">✓</div></div>
+        <div class="ref-item" onclick="this.classList.toggle('on')"><div class="ref-bg" style="background:linear-gradient(135deg,#e8d5b7,#b8892a)">📿</div><div class="ri-check">✓</div></div>
+        <div class="ref-item" onclick="this.classList.toggle('on')"><div class="ref-bg" style="background:linear-gradient(135deg,#4a6fa5,#1a1a2e)">🎨</div><div class="ri-check">✓</div></div>
+        <div class="ref-item on" onclick="this.classList.toggle('on')"><div class="ref-bg" style="background:linear-gradient(135deg,#d4515a,#3a0a10)">🧶</div><div class="ri-check">✓</div></div>
+      </div>
+
+      <div class="step-nav">
+        <button class="btn-back" onclick="goStep(4)">← Back</button>
+        <button class="btn-next" onclick="buildProfile()" style="background:var(--rust);padding:0.9rem 2.8rem">✦ Build My Profile</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SCOUT PROFILE PAGE                        -->
+<!-- ══════════════════════════════════════════ -->
+<div class="profile-page" id="page-profile">
+  <div class="profile-layout">
+
+    <div class="profile-sidebar">
+      <div class="profile-avatar">◆</div>
+      <div class="profile-name">Your Scout Profile</div>
+      <div class="profile-since">Scouting since 2026</div>
+
+      <div class="profile-section">
+        <div class="profile-section-title">Taste DNA</div>
+        <div class="dna-bar"><div class="dna-label"><span class="dna-name">Wabi-sabi</span><span class="dna-pct">82%</span></div><div class="dna-track"><div class="dna-fill" style="width:82%"></div></div></div>
+        <div class="dna-bar"><div class="dna-label"><span class="dna-name">Japandi</span><span class="dna-pct">74%</span></div><div class="dna-track"><div class="dna-fill" style="width:74%"></div></div></div>
+        <div class="dna-bar"><div class="dna-label"><span class="dna-name">Earth tones</span><span class="dna-pct">91%</span></div><div class="dna-track"><div class="dna-fill" style="width:91%"></div></div></div>
+        <div class="dna-bar"><div class="dna-label"><span class="dna-name">Mid-Century</span><span class="dna-pct">68%</span></div><div class="dna-track"><div class="dna-fill" style="width:68%"></div></div></div>
+        <div class="dna-bar"><div class="dna-label"><span class="dna-name">Art Deco</span><span class="dna-pct">55%</span></div><div class="dna-track"><div class="dna-fill" style="width:55%"></div></div></div>
+      </div>
+
+      <div class="profile-section">
+        <div class="profile-section-title">Your Eras</div>
+        <div class="era-chips">
+          <div class="era-chip"><div class="era-chip-dot"></div><div class="era-chip-label">Art Deco · 1920s–40s</div></div>
+          <div class="era-chip"><div class="era-chip-dot"></div><div class="era-chip-label">Mid-Century · 1950s–70s</div></div>
+          <div class="era-chip" style="opacity:0.5"><div class="era-chip-dot" style="background:var(--border)"></div><div class="era-chip-label">Contemporary handmade</div></div>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <div class="profile-section-title">Taste Tags</div>
+        <div class="profile-tags">
+          <span class="ptag strong">gestural</span>
+          <span class="ptag strong">earth tones</span>
+          <span class="ptag strong">hand-thrown</span>
+          <span class="ptag">visible marks</span>
+          <span class="ptag">Swiss movement</span>
+          <span class="ptag">clean dial</span>
+          <span class="ptag">abstract</span>
+          <span class="ptag">textured</span>
+          <span class="ptag">folk</span>
+          <span class="ptag">patina</span>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <button class="btn-next" style="width:100%;padding:0.8rem" onclick="showPage('taste')">Refine My Profile</button>
+      </div>
+    </div>
+
+    <div class="profile-main">
+      <div class="profile-main-title">Scouted for you today</div>
+      <div class="profile-main-sub">12 new matches · ranked by taste, not price</div>
+
+      <!-- Art section -->
+      <div class="cat-taste-section">
+        <div class="cts-header">
+          <div class="cts-title">
+            <span class="cts-icon">🖼</span>
+            <span class="cts-name">Paintings & Original Art</span>
+            <span class="cts-sub">· gestural · earth · mid-century</span>
+          </div>
+          <button class="cts-edit">Edit taste →</button>
+        </div>
+        <div class="scouted-grid">
+          <div class="scout-card">
+            <div class="sc-thumb" style="background:linear-gradient(140deg,#2d4a27,#d4a574,#9e4a28)">
+              🖼
+              <span class="sc-match">96% match</span>
+              <button class="sc-save" onclick="toggleSave(this)">♡</button>
+              <div class="sc-why">Gestural brushwork · warm earth palette · matches your wabi-sabi taste</div>
+            </div>
+            <div class="sc-body">
+              <div class="sc-title">Abstract Oil, Ochre & Umber, 1968</div>
+              <div class="sc-meta">Estate Sale · Boston, MA · c.1968</div>
+              <div class="sc-footer"><div class="sc-price">$285</div><span class="sc-src badge-estate">Estate</span></div>
+            </div>
+          </div>
+          <div class="scout-card">
+            <div class="sc-thumb" style="background:linear-gradient(130deg,#1c1710,#8b6040,#d4a574)">
+              🖌
+              <span class="sc-match">91% match</span>
+              <button class="sc-save" onclick="toggleSave(this)">♡</button>
+              <div class="sc-why">Visible impasto · raw gesture · aligns with your earth tone palette</div>
+            </div>
+            <div class="sc-body">
+              <div class="sc-title">Impasto Canvas, Unsigned Studio Work</div>
+              <div class="sc-meta">FB Marketplace · Chicago, IL</div>
+              <div class="sc-footer"><div class="sc-price">$120</div><span class="sc-src badge-fb">FB</span></div>
+            </div>
+          </div>
+          <div class="scout-card">
+            <div class="sc-thumb" style="background:linear-gradient(160deg,#9e4a28,#d4a574,#f2ece0)">
+              🖼
+              <span class="sc-match">88% match</span>
+              <button class="sc-save" onclick="toggleSave(this)">♡</button>
+              <div class="sc-why">Folk figurative · warm rust tones · handmade mid-century</div>
+            </div>
+            <div class="sc-body">
+              <div class="sc-title">Folk Portrait, Oil on Board, 1950s</div>
+              <div class="sc-meta">Auction · ends 8h · Philadelphia</div>
+              <div class="sc-footer"><div class="sc-price">$210<span class="bid-label">Bidding</span></div><span class="sc-src badge-auction">Auction</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Watches section -->
+      <div class="cat-taste-section">
+        <div class="cts-header">
+          <div class="cts-title">
+            <span class="cts-icon">⌚</span>
+            <span class="cts-name">Watches & Timepieces</span>
+            <span class="cts-sub">· Swiss · dress watches · 1960s</span>
+          </div>
+          <button class="cts-edit">Edit taste →</button>
+        </div>
+        <div class="scouted-grid">
+          <div class="scout-card">
+            <div class="sc-thumb" style="background:linear-gradient(135deg,#1c1710,#b8892a,#e8d5a0)">
+              ⌚
+              <span class="sc-match">94% match</span>
+              <button class="sc-save saved" onclick="toggleSave(this)">♥</button>
+              <div class="sc-why">Cal. 30L movement · silver sector dial · exactly your era preference</div>
+            </div>
+            <div class="sc-body">
+              <div class="sc-title">Longines 30L, Sector Dial, 1962</div>
+              <div class="sc-meta">Auction · Geneva · 1962</div>
+              <div class="sc-footer"><div class="sc-price">$480<span class="bid-label">Bid · 4h left</span></div><span class="sc-src badge-auction">Auction</span></div>
+            </div>
+          </div>
+          <div class="scout-card">
+            <div class="sc-thumb" style="background:linear-gradient(135deg,#3a3530,#6b6055,#c0b8a8)">
+              ⌚
+              <span class="sc-match">89% match</span>
+              <button class="sc-save" onclick="toggleSave(this)">♡</button>
+              <div class="sc-why">Clean minimalist dial · dress watch proportions · original hands</div>
+            </div>
+            <div class="sc-body">
+              <div class="sc-title">Omega De Ville, Cal. 625, 1967</div>
+              <div class="sc-meta">eBay Vintage · all original</div>
+              <div class="sc-footer"><div class="sc-price">$340</div><span class="sc-src badge-ebay">eBay</span></div>
+            </div>
+          </div>
+          <div class="scout-card">
+            <div class="sc-thumb" style="background:linear-gradient(135deg,#2c2418,#8a6520,#d4b870)">
+              ⌚
+              <span class="sc-match">84% match</span>
+              <button class="sc-save" onclick="toggleSave(this)">♡</button>
+              <div class="sc-why">Manual wind · champagne dial · slim case — your aesthetic exactly</div>
+            </div>
+            <div class="sc-body">
+              <div class="sc-title">IWC Cal. 89, Gold-Fill Case, 1958</div>
+              <div class="sc-meta">Estate Sale · Minneapolis</div>
+              <div class="sc-footer"><div class="sc-price">$495</div><span class="sc-src badge-estate">Estate</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ceramics section -->
+      <div class="cat-taste-section" style="border-bottom:none">
+        <div class="cts-header">
+          <div class="cts-title">
+            <span class="cts-icon">🏺</span>
+            <span class="cts-name">Ceramics & Pottery</span>
+            <span class="cts-sub">· hand-thrown · ash glaze · mingei</span>
+          </div>
+          <button class="cts-edit">Edit taste →</button>
+        </div>
+        <div class="scouted-grid">
+          <div class="scout-card">
+            <div class="sc-thumb" style="background:linear-gradient(135deg,#d4a574,#8b4513,#3a1a00)">
+              🏺
+              <span class="sc-match">97% match</span>
+              <button class="sc-save" onclick="toggleSave(this)">♡</button>
+              <div class="sc-why">Visible throwing lines · ash & iron glaze · pure mingei form</div>
+            </div>
+            <div class="sc-body">
+              <div class="sc-title">Stoneware Vase, Ash Glaze, Signed</div>
+              <div class="sc-meta">Etsy · Portland, OR · 2024</div>
+              <div class="sc-footer"><div class="sc-price">$148</div><span class="sc-src badge-etsy">Etsy</span></div>
+            </div>
+          </div>
+          <div class="scout-card">
+            <div class="sc-thumb" style="background:linear-gradient(135deg,#5a7052,#d4a574,#8b4513)">
+              🏺
+              <span class="sc-match">92% match</span>
+              <button class="sc-save" onclick="toggleSave(this)">♡</button>
+              <div class="sc-why">Folk pottery · uneven glaze · hand-formed not wheel-thrown</div>
+            </div>
+            <div class="sc-body">
+              <div class="sc-title">Hand-Built Jar, Folk Pottery, 1940s</div>
+              <div class="sc-meta">Estate Sale · Asheville, NC</div>
+              <div class="sc-footer"><div class="sc-price">$95</div><span class="sc-src badge-estate">Estate</span></div>
+            </div>
+          </div>
+          <div class="scout-card">
+            <div class="sc-thumb" style="background:linear-gradient(135deg,#e8d5b7,#b8892a,#6b3a2a)">
+              🏺
+              <span class="sc-match">87% match</span>
+              <button class="sc-save" onclick="toggleSave(this)">♡</button>
+              <div class="sc-why">Tenmoku-style glaze · Japanese influence · wabi-sabi form</div>
+            </div>
+            <div class="sc-body">
+              <div class="sc-title">Tenmoku Bowl, Studio Potter, 1970s</div>
+              <div class="sc-meta">eBay Vintage · Pacific NW</div>
+              <div class="sc-footer"><div class="sc-price">$175</div><span class="sc-src badge-ebay">eBay</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- DISCOVER PAGE                             -->
+<!-- ══════════════════════════════════════════ -->
+<div class="discover-page visible" id="page-discover">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-left">
+      <div class="hero-eyebrow">Handmade · Vintage · Genuinely yours</div>
+      <h1 class="hero-title">Scout for<br><em>genuine</em><br>gems.</h1>
+      <p class="hero-body">Gem Scouter scouts every corner of the handmade and vintage market for things that are genuinely rare and genuinely yours. A $35 folk painting can move you more than a $3,000 print. Value is what you feel, not what you paid.</p>
+      <div class="hero-cta">
+        <button class="btn-main" onclick="showPage('taste')">Build Taste Profile</button>
+        <button class="btn-ghost">How it works</button>
+      </div>
+      <div class="source-list">
+        <span class="source-label">Searching across</span>
+        <span class="src-pill">Etsy</span>
+        <span class="src-pill">FB Marketplace</span>
+        <span class="src-pill">Auctions</span>
+        <span class="src-pill">Estate Sales</span>
+        <span class="src-pill">eBay Vintage</span>
+        <span class="src-pill">Ruby Lane</span>
+      </div>
+      <div style="margin-top:1.5rem;display:inline-flex;align-items:center;gap:0.6rem;padding:0.7rem 1.2rem;background:var(--rust);color:white;border-radius:2px;">
+        <span style="font-size:1.1rem;font-family:Cormorant Garamond,serif;font-weight:600">00</span>
+        <span style="font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;line-height:1.4">Your taste<br>is the only filter</span>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="cat-cell"><div class="cat-icon">🖼</div><div class="cat-name">Paintings</div><div class="cat-count">4,120 pieces</div></div>
+      <div class="cat-cell"><div class="cat-icon">🏺</div><div class="cat-name">Ceramics</div><div class="cat-count">2,841 pieces</div></div>
+      <div class="cat-cell"><div class="cat-icon">💍</div><div class="cat-name">Jewelry</div><div class="cat-count">6,340 pieces</div></div>
+      <div class="cat-cell"><div class="cat-icon">🧶</div><div class="cat-name">Textiles</div><div class="cat-count">1,920 pieces</div></div>
+      <div class="cat-cell"><div class="cat-icon">🗿</div><div class="cat-name">Sculpture</div><div class="cat-count">890 pieces</div></div>
+      <div class="cat-cell featured">
+        <div class="featured-text">
+          <span class="featured-badge">✦ New category</span>
+          <div class="cat-name">Watches & Timepieces</div>
+          <div class="cat-count">1,204 vintage & handmade pieces</div>
+        </div>
+        <div class="cat-icon">⌚</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee-strip">
+    <div class="marquee-track">
+      <span>No mass production</span><span>No dropshipping</span><span>No digital prints</span><span>Price doesn't signal value</span><span>Only handmade</span><span>Only vintage</span><span>Only one of a kind</span><span>Art is subjective</span><span>Your taste is the filter</span>
+      <span>No mass production</span><span>No dropshipping</span><span>No digital prints</span><span>Price doesn't signal value</span><span>Only handmade</span><span>Only vintage</span><span>Only one of a kind</span><span>Art is subjective</span><span>Your taste is the filter</span>
+    </div>
+  </div>
+
+  <!-- SEARCH + ERA FILTER -->
+  <div class="search-era-wrap">
+    <div class="search-era-inner">
+      <div class="search-top">
+        <div class="search-field">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          <input type="text" placeholder="Scout for handmade ceramics, vintage watches, original oil paintings…" id="searchInput"/>
+        </div>
+        <button class="search-go" onclick="doSearch()">Scout It</button>
+      </div>
+
+      <div class="filter-row">
+        <div class="filter-unit">
+          <label>Category</label>
+          <select>
+            <option>All categories</option>
+            <option>Paintings & original art</option>
+            <option>Ceramics & pottery</option>
+            <option>Jewelry</option>
+            <option>Watches & timepieces</option>
+            <option>Textiles & fiber arts</option>
+            <option>Sculpture & objects</option>
+            <option>Furniture & decor</option>
+          </select>
+        </div>
+
+        <!-- ERA as visual inline button strip -->
+        <div class="filter-unit era-filter-unit">
+          <label>Era / Time Period</label>
+          <div class="era-mini-track">
+            <button class="era-mini-btn" onclick="toggleEra(this)">Victorian<div class="era-mini-year">pre-1900</div></button>
+            <button class="era-mini-btn on" onclick="toggleEra(this)">Art Deco<div class="era-mini-year">1920–40s</div></button>
+            <button class="era-mini-btn on" onclick="toggleEra(this)">Mid-Century<div class="era-mini-year">1945–70s</div></button>
+            <button class="era-mini-btn" onclick="toggleEra(this)">Late Modern<div class="era-mini-year">1970–90s</div></button>
+            <button class="era-mini-btn" onclick="toggleEra(this)">Contemporary<div class="era-mini-year">1990–now</div></button>
+          </div>
+        </div>
+
+        <div class="filter-unit">
+          <label>Price</label>
+          <select>
+            <option>Any price</option>
+            <option>Under $50</option>
+            <option>$50 – $150</option>
+            <option>$150 – $400</option>
+            <option>$400 – $1,000</option>
+            <option>$1,000+</option>
+          </select>
+        </div>
+
+        <div class="filter-unit">
+          <label>Source</label>
+          <select>
+            <option>All sources</option>
+            <option>Etsy (handmade only)</option>
+            <option>Facebook Marketplace</option>
+            <option>Auction houses</option>
+            <option>Estate sales</option>
+            <option>Ruby Lane</option>
+          </select>
+        </div>
+
+        <div class="filter-unit color-unit">
+          <label>Color</label>
+          <div class="color-dots">
+            <div class="cdot on" style="background:#d4a574"></div>
+            <div class="cdot" style="background:#9e4a28"></div>
+            <div class="cdot on" style="background:#5a7052"></div>
+            <div class="cdot" style="background:#4a6fa5"></div>
+            <div class="cdot" style="background:#b8892a"></div>
+            <div class="cdot" style="background:#1c1710"></div>
+            <div class="cdot" style="background:#9b7fa6"></div>
+            <div class="cdot" style="background:#d4515a"></div>
+            <div class="cdot" style="background:#e8e0d0"></div>
+          </div>
+        </div>
+
+        <div class="auth-toggle">
+          <label style="font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--stone)">Type</label>
+          <div class="toggle-row">
+            <button class="tog active" onclick="this.classList.toggle('active')">Handmade</button>
+            <button class="tog active" onclick="this.classList.toggle('active')">Vintage</button>
+            <button class="tog" onclick="this.classList.toggle('active')">Antique</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TASTE BAR -->
+  <div class="taste-bar">
+    <div class="taste-inner">
+      <span class="taste-label">Aesthetic</span>
+      <button class="taste-profile-btn" onclick="showPage('taste')">✦ Build taste profile</button>
+      <button class="ttag on" onclick="this.classList.toggle('on')">Wabi-sabi</button>
+      <button class="ttag on" onclick="this.classList.toggle('on')">Japandi</button>
+      <button class="ttag" onclick="this.classList.toggle('on')">Dark academia</button>
+      <button class="ttag" onclick="this.classList.toggle('on')">Cottagecore</button>
+      <button class="ttag on" onclick="this.classList.toggle('on')">Earth tones</button>
+      <button class="ttag" onclick="this.classList.toggle('on')">Maximalist</button>
+      <button class="ttag" onclick="this.classList.toggle('on')">Folk art</button>
+      <button class="ttag" onclick="this.classList.toggle('on')">Art nouveau</button>
+      <button class="ttag" onclick="this.classList.toggle('on')">Industrial</button>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results-section">
+    <div class="results-bar">
+      <div>
+        <div class="results-count" id="resultsCount">1,284 handmade &amp; vintage finds</div>
+        <div class="results-sub">verified handmade &amp; vintage · price never ranks results · updated 2 min ago</div>
+      </div>
+      <div class="sort-row">
+        <span class="sort-lbl">Sort</span>
+        <button class="sopt on" onclick="setSort(this)">Newest</button>
+        <button class="sopt" onclick="setSort(this)">Price ↑</button>
+        <button class="sopt" onclick="setSort(this)">Price ↓</button>
+        <button class="sopt" onclick="setSort(this)">Ending soon</button>
+        <button class="sopt" onclick="setSort(this)">Best match</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-img-wrap"><div class="card-thumb" style="background:linear-gradient(135deg,#d4a574,#9e4a28,#6b3a2a)">🏺</div><div class="verify-dot"></div><span class="src-badge badge-etsy">Etsy</span><button class="save-btn" onclick="toggleSave(this)">♡</button></div>
+        <div class="card-body"><div class="card-title">Thrown Stoneware Vase, Ash Glaze</div><div class="card-meta">Handmade <span class="meta-dot"></span> Portland, OR</div><div class="card-footer"><div class="card-price">$148</div><div class="card-mtags"><span class="mtag">ceramic</span><span class="mtag">wabi-sabi</span></div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-img-wrap"><div class="card-thumb" style="background:linear-gradient(135deg,#2c2418,#b8892a,#8a6520)">⌚</div><div class="verify-dot"></div><span class="src-badge badge-auction">Auction</span><button class="save-btn saved" onclick="toggleSave(this)">♥</button></div>
+        <div class="card-body"><div class="card-title">Longines 30L, Cal. 30L Movement, 1962</div><div class="card-meta">Vintage <span class="meta-dot"></span> Geneva, CH</div><div class="card-footer"><div class="card-price">$480<span class="bid-label">Bid · ends 6h</span></div><div class="card-mtags"><span class="mtag">watch</span><span class="mtag">Swiss</span></div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-img-wrap"><div class="card-thumb" style="background:linear-gradient(150deg,#2d4a27,#5a7052,#c9d8ca)">🖼</div><div class="verify-dot"></div><span class="src-badge badge-estate">Estate</span><button class="save-btn" onclick="toggleSave(this)">♡</button></div>
+        <div class="card-body"><div class="card-title">Oil on Canvas — Autumn Marsh, c.1955</div><div class="card-meta">Vintage <span class="meta-dot"></span> Boston, MA</div><div class="card-footer"><div class="card-price">$310</div><div class="card-mtags"><span class="mtag">painting</span><span class="mtag">landscape</span></div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-img-wrap"><div class="card-thumb" style="background:linear-gradient(135deg,#1c1710,#b8892a,#e8d5a0)">💍</div><div class="verify-dot"></div><span class="src-badge badge-estate">Estate</span><button class="save-btn" onclick="toggleSave(this)">♡</button></div>
+        <div class="card-body"><div class="card-title">Art Deco Brooch, Gold-Fill Filigree</div><div class="card-meta">Antique <span class="meta-dot"></span> New York, NY</div><div class="card-footer"><div class="card-price">$185</div><div class="card-mtags"><span class="mtag">jewelry</span><span class="mtag">art deco</span></div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-img-wrap"><div class="card-thumb" style="background:linear-gradient(150deg,#e8d5b7,#d4a574,#9b7fa6)">🧶</div><div class="verify-dot"></div><span class="src-badge badge-etsy">Etsy</span><button class="save-btn" onclick="toggleSave(this)">♡</button></div>
+        <div class="card-body"><div class="card-title">Hand-woven Wall Hanging, Natural Wool</div><div class="card-meta">Handmade <span class="meta-dot"></span> Asheville, NC</div><div class="card-footer"><div class="card-price">$210</div><div class="card-mtags"><span class="mtag">textile</span><span class="mtag">fiber art</span></div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-img-wrap"><div class="card-thumb" style="background:linear-gradient(135deg,#3a3530,#6b6055,#c0b8a8)">⌚</div><div class="verify-dot"></div><span class="src-badge badge-fb">FB</span><button class="save-btn" onclick="toggleSave(this)">♡</button></div>
+        <div class="card-body"><div class="card-title">Seiko 5 Automatic, Original Dial, 1974</div><div class="card-meta">Vintage <span class="meta-dot"></span> Chicago, IL</div><div class="card-footer"><div class="card-price">$95</div><div class="card-mtags"><span class="mtag">watch</span><span class="mtag">Japanese</span></div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-img-wrap"><div class="card-thumb" style="background:linear-gradient(140deg,#2c2c2c,#5a5a5a,#8a8a8a)">🗿</div><div class="verify-dot"></div><span class="src-badge badge-ebay">eBay</span><button class="save-btn" onclick="toggleSave(this)">♡</button></div>
+        <div class="card-body"><div class="card-title">Cast Iron Abstract, Studio Piece, 1970s</div><div class="card-meta">Vintage <span class="meta-dot"></span> Detroit, MI</div><div class="card-footer"><div class="card-price">$380</div><div class="card-mtags"><span class="mtag">sculpture</span><span class="mtag">industrial</span></div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-img-wrap"><div class="card-thumb" style="background:linear-gradient(130deg,#e8d5b7,#b8892a,#8a5a00)">📿</div><div class="verify-dot"></div><span class="src-badge badge-estate">Estate</span><button class="save-btn" onclick="toggleSave(this)">♡</button></div>
+        <div class="card-body"><div class="card-title">Baltic Amber Bead Necklace, Knotted</div><div class="card-meta">Antique <span class="meta-dot"></span> Minneapolis, MN</div><div class="card-footer"><div class="card-price">$265</div><div class="card-mtags"><span class="mtag">jewelry</span><span class="mtag">amber</span></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IDENTITY -->
+  <div style="background:var(--parchment);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+    <div class="identity">
+      <div class="identity-text">
+        <h2>Price doesn't<br>tell you what's <em>rare.</em></h2>
+        <p>Most people assume expensive means special. We don't. A hand-thrown bowl found at an estate sale for $40 can be more remarkable than anything on a luxury platform. Gem Scouter filters out the mass-produced and surfaces what's genuinely rare — then lets your taste decide what's worth it.</p>
+        <div class="pledge-list">
+          <div class="pledge"><div class="pledge-icon">✓</div>No print-on-demand or digital reproductions</div>
+          <div class="pledge"><div class="pledge-icon">✓</div>No factory ceramics or mass-cast jewelry</div>
+          <div class="pledge"><div class="pledge-icon">✓</div>Vintage must be 20+ years old, verified</div>
+          <div class="pledge"><div class="pledge-icon">✓</div>Watches verified mechanical or hand-wound</div>
+          <div class="pledge"><div class="pledge-icon">✓</div>Every piece linked to a named maker or provenance</div>
+          <div class="pledge"><div class="pledge-icon">✓</div>Price is never used to rank or surface results — your taste is</div>
+        </div>
+      </div>
+      <div class="identity-visual">
+        <div class="id-block"><div class="id-num">94%</div><div class="id-label">Items filtered out</div><div class="id-desc">Only the genuinely handmade and vintage makes it through our filter — regardless of price.</div></div>
+        <div class="id-block"><div class="id-num">12</div><div class="id-label">Sources searched</div></div>
+        <div class="id-block"><div class="id-num">48k</div><div class="id-label">Verified pieces</div></div>
+        <div class="id-block"><div class="id-num">∞</div><div class="id-label">Saved searches</div></div>
+        <div class="id-block" style="grid-column:span 2;background:var(--rust);color:white;border:none">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:300;font-style:italic">Your taste<br>is the filter.</div>
+          <div style="font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7)">Rare at every price</div>
+          <div style="font-size:0.8rem;color:rgba(255,255,255,0.85);line-height:1.5">A $22 painting can move you more than a $2,000 print. Your taste decides what's worth it.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /discover-page -->
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">
+    <div class="logo-mark">
+      <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
+        <polygon points="16,2 28,10 28,22 16,30 4,22 4,10" stroke="rgba(242,236,224,0.25)" stroke-width="1" fill="none"/>
+        <polygon points="16,2 28,10 16,14 4,10" stroke="#9e4a28" stroke-width="0.8" fill="none"/>
+        <line x1="16" y1="14" x2="16" y2="30" stroke="#9e4a28" stroke-width="0.8"/>
+      </svg>
+      <div><span class="logo-wordmark">Gem Scouter</span><span class="logo-tagline">Rare finds that speak to you</span></div>
+    </div>
+    <p>Scouting every corner of the handmade and vintage market for things that are genuinely rare. Price never signals value here — your taste does.</p>
+  </div>
+  <div class="footer-col"><h4>Discover</h4><ul><li><a href="#">Browse all</a></li><li><a href="#">Ceramics</a></li><li><a href="#">Watches</a></li><li><a href="#">Paintings</a></li><li><a href="#">Jewelry</a></li></ul></div>
+  <div class="footer-col"><h4>Your Profile</h4><ul><li><a href="#">Saved items</a></li><li><a href="#">Search alerts</a></li><li><a href="#" onclick="showPage('profile');return false;">Scout profile</a></li><li><a href="#">Sign in</a></li></ul></div>
+  <div class="footer-col"><h4>Company</h4><ul><li><a href="#">About Gem Scouter</a></li><li><a href="#">Scouting promise</a></li><li><a href="#">For sellers</a></li><li><a href="#">Privacy</a></li></ul></div>
+</footer>
+<div class="footer-bottom">
+  <span>© 2026 Gem Scouter · Rare finds at every price point</span>
+  <span>Art is subjective. Your taste is the only metric.</span>
+</div>
+
+<script>
+// Cursor
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e => {
+  mx=e.clientX; my=e.clientY;
+  cursor.style.left=mx+'px'; cursor.style.top=my+'px';
+});
+(function animRing(){
+  rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12;
+  ring.style.left=rx+'px'; ring.style.top=ry+'px';
+  requestAnimationFrame(animRing);
+})();
+
+// Page switching
+function showPage(p) {
+  ['discover','taste','profile'].forEach(id => {
+    document.getElementById('page-'+id).classList.toggle('visible', id===p);
+    const t = document.getElementById('tab-'+id);
+    if(t) t.classList.toggle('active', id===p);
+  });
+  // update nav links
+  document.querySelectorAll('.nav-center a').forEach(a => a.classList.remove('active'));
+  window.scrollTo(0,0);
+}
+
+// Taste steps
+let currentStep = 1;
+function goStep(n) {
+  document.getElementById('ts'+currentStep).classList.remove('active');
+  document.getElementById('ps'+currentStep).classList.remove('active');
+  document.getElementById('ps'+currentStep).classList.add('done');
+  currentStep = n;
+  document.getElementById('ts'+n).classList.add('active');
+  document.getElementById('ps'+n).classList.add('active');
+  document.getElementById('progress-label').textContent = 'Step '+n+' of 5';
+  // remove done from future steps
+  for(let i=n;i<=5;i++) {
+    const s = document.getElementById('ps'+i);
+    if(s) { s.classList.remove('done'); if(i===n) s.classList.add('active'); else s.classList.remove('active'); }
+  }
+  window.scrollTo(0,200);
+}
+
+function buildProfile() {
+  showPage('profile');
+}
+
+// Save toggle
+function toggleSave(btn) {
+  const s = btn.classList.toggle('saved');
+  btn.textContent = s ? '♥' : '♡';
+}
+
+// Sort
+function setSort(el) {
+  document.querySelectorAll('.sopt').forEach(s=>s.classList.remove('on'));
+  el.classList.add('on');
+}
+
+// Era filter
+function toggleEra(el) { el.classList.toggle('on'); }
+
+// Color dots
+document.querySelectorAll('.cdot').forEach(d=>d.addEventListener('click',()=>d.classList.toggle('on')));
+
+// Search
+function doSearch() {
+  const val = document.getElementById('searchInput').value.trim();
+  if(val) {
+    document.getElementById('resultsCount').innerHTML = 'Scouting for &ldquo;'+val+'&rdquo;&hellip;';
+    setTimeout(()=>{ document.getElementById('resultsCount').innerHTML = '284 verified finds for &ldquo;'+val+'&rdquo;'; }, 900);
+  }
+}
+document.getElementById('searchInput').addEventListener('keydown', e=>{ if(e.key==='Enter') doSearch(); });
+
+// Fill example in textarea
+function fillExample(el) {
+  document.getElementById('describeText').value = el.textContent.replace(/[""]/g,'');
+}
+</script>
+</body>
+</html>
