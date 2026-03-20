@@ -1,0 +1,15 @@
+{
+  "name": "gemscouter",
+  "version": "1.0.0",
+  "description": "Gem Scouter — eBay API scout",
+  "scripts": {
+    "scout": "node scripts/scout.js",
+    "test-auth": "node -e \"require('dotenv').config();const{getToken}=require('./scripts/ebay-client');getToken(process.env.EBAY_CLIENT_ID,process.env.EBAY_CLIENT_SECRET).then(t=>console.log('✓ Auth works. Token starts:',t.slice(0,30)+'...')).catch(e=>console.error('✗',e.message))\""
+  },
+  "dependencies": {
+    "dotenv": "^16.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
