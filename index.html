@@ -1427,7 +1427,7 @@ function fillExample(el) {
     const sub = document.getElementById('resultsSub');
 
     try {
-      const res = await fetch('/data/listings.json');
+      const res = await fetch('/listings.json');
 
       if (!res.ok) throw new Error(`API returned ${res.status}`);
 
