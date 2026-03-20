@@ -1166,7 +1166,7 @@ footer { background:var(--deep);color:var(--parchment);padding:3rem;display:grid
       <div style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-style:italic;margin-bottom:0.5rem">Scouting for gems...</div>
       <div style="font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase">checking your collection</div>
     </div>
-    <div class="grid" id="listingsGrid" style="display:none"></div>
+    <div class="grid" id="listingsGrid" style="display:none;grid-template-columns:repeat(5,minmax(0,1fr));gap:0.6rem;"></div>
         <div class="card-body">
           <a href="https://www.ebay.com/itm/336428618001?mkcid=1&mkrid=711-53200-19255-0&siteid=0&campid=5339145706&toolid=80005&mkevt=1" target="_blank" rel="noopener" style="text-decoration:none;color:inherit">
             <div class="card-title">Dufonte Quartz Watch, Gold Tone Enamel Bezel, Leather Strap</div>
@@ -1617,7 +1617,7 @@ function fillExample(el) {
       if (!data || !data.total) throw new Error('Empty');
       allListings = (data.pinned||[]).concat(data.scouted||[]);
       loading.style.display = 'none';
-      grid.style.display = 'grid';
+      grid.style.display = 'grid'; grid.style.gridTemplateColumns = 'repeat(5,minmax(0,1fr))'; grid.style.gap = '0.6rem';
       renderGrid(allListings);
       count.innerHTML = data.total+' handmade &amp; vintage finds';
       var t = data.scoutedAt ? new Date(data.scoutedAt).toLocaleTimeString() : 'recently';
@@ -1626,7 +1626,7 @@ function fillExample(el) {
       console.warn('listings.json unavailable:', err.message);
       allListings = FALLBACK;
       loading.style.display = 'none';
-      grid.style.display = 'grid';
+      grid.style.display = 'grid'; grid.style.gridTemplateColumns = 'repeat(5,minmax(0,1fr))'; grid.style.gap = '0.6rem';
       renderGrid(FALLBACK);
       count.innerHTML = FALLBACK.length+' hand-picked vintage finds';
       if(sub) sub.textContent = 'from your eBay collection';
