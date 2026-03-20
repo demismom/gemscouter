@@ -1314,7 +1314,7 @@ function fillExample(el) {
 }
 </script>
 </body>
- // ── DYNAMIC LISTINGS LOADER (eBay Browse API) ──────────────
+  // ── DYNAMIC LISTINGS LOADER (eBay Browse API) ──────────────
 
   // Fallback — shown if API is temporarily unavailable
   const FALLBACK_LISTINGS = [
@@ -1427,7 +1427,7 @@ function fillExample(el) {
     const sub = document.getElementById('resultsSub');
 
     try {
-      const res = await fetch('/listings.json');
+      const res = await fetch('/.netlify/functions/listings?limit=24&sort=score');
 
       if (!res.ok) throw new Error(`API returned ${res.status}`);
 
@@ -1442,9 +1442,9 @@ function fillExample(el) {
       grid.style.display = 'grid';
       renderListings(pinned, scouted);
 
-      const ago = data.scoutedAt ? new Date(data.scoutedAt).toLocaleString() : 'recently';
+      const ago = data.fromCache ? 'cached' : 'just now';
       count.innerHTML = `${data.total} handmade &amp; vintage finds`;
-      sub.textContent = `${pinned.length} hand-picked · ${scouted.length} scouted · last updated ${ago}`;
+      sub.textContent = `${pinned.length} hand-picked · ${scouted.length} scouted · updated ${ago}`;
 
     } catch (err) {
       console.warn('API unavailable, using fallback:', err.message);
