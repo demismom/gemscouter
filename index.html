@@ -54,11 +54,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
 .search-btn:hover{background:var(--rust);}
 
 /* AESTHETICS BAR */
-.taste-bar{padding:0.8rem 2rem;border-bottom:1px solid var(--border);display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;}
-.taste-label{font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--stone);margin-right:0.3rem;}
-.ttag{padding:0.3rem 0.8rem;border:1px solid var(--border);border-radius:999px;font-size:0.7rem;cursor:pointer;background:white;color:var(--umber);transition:all 0.15s;font-family:'Jost',sans-serif;}
-.ttag:hover{border-color:var(--rust);color:var(--rust);}
-.ttag.on{background:var(--rust);color:white;border-color:var(--rust);}
 
 /* RESULTS */
 .results-bar{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;border-bottom:1px solid var(--border);}
@@ -106,7 +101,6 @@ footer{background:var(--deep);color:var(--cream);padding:2rem;display:flex;justi
   <a class="logo" href="#">Gem <span>Scouter</span></a>
   <div class="nav-right">
     <button class="nav-btn ghost">♡ Saved</button>
-    <button class="nav-btn solid">Build Taste Profile</button>
   </div>
 </nav>
 
@@ -163,17 +157,7 @@ footer{background:var(--deep);color:var(--cream);padding:2rem;display:flex;justi
   </div>
 </div>
 
-<div class="taste-bar">
-  <span class="taste-label">Aesthetic</span>
-  <button class="ttag on" onclick="this.classList.toggle('on');applyFilters()">Wabi-sabi</button>
-  <button class="ttag on" onclick="this.classList.toggle('on');applyFilters()">Japandi</button>
-  <button class="ttag" onclick="this.classList.toggle('on');applyFilters()">Art Deco</button>
-  <button class="ttag" onclick="this.classList.toggle('on');applyFilters()">Mid-Century</button>
-  <button class="ttag on" onclick="this.classList.toggle('on');applyFilters()">Earth tones</button>
-  <button class="ttag" onclick="this.classList.toggle('on');applyFilters()">Folk art</button>
-  <button class="ttag" onclick="this.classList.toggle('on');applyFilters()">Dark academia</button>
-  <button class="ttag" onclick="this.classList.toggle('on');applyFilters()">Industrial</button>
-</div>
+
 
 <div class="results-bar">
   <div>
