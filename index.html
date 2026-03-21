@@ -310,7 +310,7 @@ function buildCard(item) {
   var tags = (item.tags || []).slice(0, 3).map(function(t) {
     return '<span class="mtag">' + t + '</span>';
   }).join('');
-  var badge = item.pinned ? 'Hand-picked' : 'eBay';
+  var badge = item.pinned ? (item.source && item.source !== 'eBay' ? item.source.split('/')[0].trim() : 'Hand-picked') : 'eBay';
   var badgeClass = item.pinned ? 'card-badge pinned' : 'card-badge';
   var isSaved = savedIds.indexOf(item.id) !== -1;
   var heartIcon = isSaved ? '&#x2665;' : '&#x2661;';
