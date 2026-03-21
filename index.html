@@ -115,8 +115,8 @@ footer{background:var(--deep);color:var(--cream);padding:2rem;display:flex;justi
 
 <div class="marquee">
   <div class="marquee-track">
-    <span>No mass production</span><span>No dropshipping</span><span>No digital prints</span><span>Only handmade</span><span>Only vintage</span><span>Price doesn't signal value</span><span>Art is subjective</span>
-    <span>No mass production</span><span>No dropshipping</span><span>No digital prints</span><span>Only handmade</span><span>Only vintage</span><span>Price doesn't signal value</span><span>Art is subjective</span>
+    <span>No mass production</span><span>No digital prints</span><span>Only handmade</span><span>Only vintage</span><span>Price doesn't signal value</span><span>Art is subjective</span>
+    <span>No mass production</span><span>No digital prints</span><span>Only handmade</span><span>Only vintage</span><span>Price doesn't signal value</span><span>Art is subjective</span>
   </div>
 </div>
 
@@ -233,8 +233,12 @@ function getFiltered() {
   var sort = document.getElementById('filterSort').value;
   var q = searchQuery.toLowerCase();
 
-  var EXCLUDED = ['Ceramics & Pottery','Textiles & Fiber Arts','Vintage & Handmade'];
+  var EXCLUDED = ['Ceramics & Pottery','Textiles & Fiber Arts'];
   var items = allListings.filter(function(item) {
+    // Skip items with no image or known placeholder images
+    if (!item.imageUrl) return false;
+    if (item.imageUrl.indexOf('no_picture') !== -1) return false;
+    if (item.imageUrl.indexOf('placeholder') !== -1) return false;
     if (EXCLUDED.indexOf(item.category) !== -1) return false;
     if (cat && item.category !== cat) return false;
     if (item.price > maxPrice) return false;
