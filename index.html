@@ -315,8 +315,9 @@ function buildCard(item) {
   var isSaved = savedIds.indexOf(item.id) !== -1;
   var heartIcon = isSaved ? '&#x2665;' : '&#x2661;';
   var heartColor = isSaved ? 'color:var(--rust)' : '';
-  var imgHtml = item.imageUrl
-    ? '<img class="card-img" src="' + item.imageUrl + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
+  var imgUrl = item.imageUrl ? item.imageUrl.replace('http://', 'https://') : '';
+  var imgHtml = imgUrl
+    ? '<img class="card-img" src="' + imgUrl + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
       '<div class="card-img-placeholder" style="display:none">&#x231A;</div>'
     : '<div class="card-img-placeholder">&#x231A;</div>';
 
