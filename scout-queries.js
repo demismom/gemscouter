@@ -30,7 +30,7 @@ module.exports = [
     categoryId: '48579',
     conditions: ['USED'],
     requireOneOf: ['vintage','antique','handmade','art deco','art nouveau','sterling','rare','gem','filigree','bakelite','enamel','mid century','folk','one of a kind','studio'],
-    exclude: ['case','barbie','dolls','kids','childrens','lot','wholesale','replica','fashion jewelry','costume lot','mass','factory','brooch','broach','vase','box','organizer','holder'],
+    exclude: ['case','barbie','dolls','kids','childrens','lot','wholesale','replica','fashion jewelry','costume lot','mass','factory','brooch','broach','vase','box','organizer','holder','lapel'],
     priceMin: 10,
     priceMax: 500,
     limit: 100,
