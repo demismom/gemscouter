@@ -1,7 +1,7 @@
 /**
  * Gem Scouter — Scout Query Definitions
  * Categories: Watches, Jewelry, Paintings, Eyewear
- * Max price: $500
+ * Max price: $500 · Limit: 100 per category (eBay API max)
  */
 
 module.exports = [
@@ -18,7 +18,7 @@ module.exports = [
     exclude: ['lot','parts','repair','broken','replica','smartwatch','digital','fitbit','apple','wholesale'],
     priceMin: 15,
     priceMax: 500,
-    limit: 30,
+    limit: 100,
   },
 
   {
@@ -33,7 +33,7 @@ module.exports = [
     exclude: ['lot','wholesale','replica','fashion jewelry','costume lot','new','mass','factory'],
     priceMin: 10,
     priceMax: 500,
-    limit: 30,
+    limit: 100,
   },
 
   {
@@ -48,7 +48,7 @@ module.exports = [
     exclude: ['print','giclee','reproduction','poster','lithograph','lot','canvas print','digital','ai generated','copy','replica'],
     priceMin: 10,
     priceMax: 500,
-    limit: 30,
+    limit: 100,
   },
 
   {
@@ -63,7 +63,7 @@ module.exports = [
     exclude: ['lot','wholesale','replica','new','modern','brand new','cheap'],
     priceMin: 10,
     priceMax: 500,
-    limit: 20,
+    limit: 100,
   },
 
 ];
