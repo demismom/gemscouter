@@ -123,7 +123,7 @@ footer{background:var(--deep);color:var(--cream);padding:2rem;display:flex;justi
 <section class="hero">
   <div class="hero-eyebrow">Handmade · Vintage · Genuinely yours</div>
   <h1>Scout for <em>genuine</em> gems.</h1>
-  <p>Rare handmade and vintage finds from across eBay, estate sales, auctions and more. Price never ranks results — your taste does.</p>
+  <p>Rare handmade and vintage finds from across the web. Price never ranks results — your taste does.</p>
 </section>
 
 <div class="filters">
@@ -141,7 +141,7 @@ footer{background:var(--deep);color:var(--cream);padding:2rem;display:flex;justi
       <option value="Watches & Timepieces">Watches</option>
       <option value="Paintings & Original Art">Paintings</option>
       <option value="Jewelry & Accessories">Jewelry</option>
-      <option value="Eyewear">Eyewear</option>
+      <option value="Eyewear & Sunglasses">Eyewear</option>
     </select>
   </div>
   <div class="filter-group">
@@ -233,7 +233,7 @@ function getFiltered() {
   var sort = document.getElementById('filterSort').value;
   var q = searchQuery.toLowerCase();
 
-  var EXCLUDED = ['Ceramics & Pottery','Textiles & Fiber Arts'];
+  var EXCLUDED = ['Ceramics & Pottery','Textiles & Fiber Arts','Vintage & Handmade'];
   var items = allListings.filter(function(item) {
     if (EXCLUDED.indexOf(item.category) !== -1) return false;
     if (cat && item.category !== cat) return false;
@@ -245,12 +245,79 @@ function getFiltered() {
   if (sort === 'price-asc') items.sort(function(a,b){return a.price-b.price;});
   else if (sort === 'price-desc') items.sort(function(a,b){return b.price-a.price;});
 
+  // Deduplicate — remove listings with near-identical titles (e.g. same watch in different colors)
+  var seen = {};
+  items = items.filter(function(item) {
+    // Normalise title: lowercase, strip color words and common variants
+    var key = item.title.toLowerCase()
+      .replace(/(black|brown|blue|green|red|white|grey|gray|silver|gold|leather|nato|rubber|strap|band|new|free shipping)/g, '')
+      .replace(/\s+/g, ' ').trim()
+      .substring(0, 60);
+    if (seen[key]) return false;
+    seen[key] = true;
+    return true;
+  });
+
+  // Mix categories — interleave pinned and scouted by category for variety
+  var byCategory = {};
+  items.forEach(function(item) {
+    var cat = item.category || 'Other';
+    if (!byCategory[cat]) byCategory[cat] = [];
+    byCategory[cat].push(item);
+  });
+  var cats = Object.keys(byCategory);
+  var mixed = [];
+  var maxLen = Math.max.apply(null, cats.map(function(c){return byCategory[c].length;}));
+  for (var i = 0; i < maxLen; i++) {
+    cats.forEach(function(cat) {
+      if (byCategory[cat][i]) mixed.push(byCategory[cat][i]);
+    });
+  }
+  items = mixed;
+
   return items;
+}
+
+function dedupeItems(items) {
+  var seen = {};
+  return items.filter(function(item) {
+    // Dedupe by normalising title - strip color/variant words and check seller
+    var key = item.title
+      .toLowerCase()
+      .replace(/\b(black|brown|green|blue|red|white|gold|silver|grey|gray)\b/g, '')
+      .replace(/\s+/g, ' ')
+      .substring(0, 40)
+      + '|' + (item.seller || '');
+    if (seen[key]) return false;
+    seen[key] = true;
+    return true;
+  });
+}
+
+function shuffleMix(items) {
+  // Interleave categories so page feels varied
+  var byCategory = {};
+  items.forEach(function(item) {
+    var cat = item.category || 'other';
+    if (!byCategory[cat]) byCategory[cat] = [];
+    byCategory[cat].push(item);
+  });
+  var cats = Object.values(byCategory);
+  var mixed = [];
+  var maxLen = Math.max.apply(null, cats.map(function(c){return c.length;}));
+  for (var i = 0; i < maxLen; i++) {
+    cats.forEach(function(cat) {
+      if (cat[i]) mixed.push(cat[i]);
+    });
+  }
+  return mixed;
 }
 
 function renderGrid() {
   var grid = document.getElementById('listingGrid');
   var items = getFiltered();
+  items = dedupeItems(items);
+  items = shuffleMix(items);
   if (!items.length) {
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--stone);font-family:Cormorant Garamond,serif;font-style:italic;font-size:1.2rem">No gems found — try broadening your search</div>';
   } else {
