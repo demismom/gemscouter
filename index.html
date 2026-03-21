@@ -249,36 +249,6 @@ function getFiltered() {
   if (sort === 'price-asc') items.sort(function(a,b){return a.price-b.price;});
   else if (sort === 'price-desc') items.sort(function(a,b){return b.price-a.price;});
 
-  // Deduplicate — remove listings with near-identical titles (e.g. same watch in different colors)
-  var seen = {};
-  items = items.filter(function(item) {
-    // Normalise title: lowercase, strip color words and common variants
-    var key = item.title.toLowerCase()
-      .replace(/(black|brown|blue|green|red|white|grey|gray|silver|gold|leather|nato|rubber|strap|band|new|free shipping)/g, '')
-      .replace(/\s+/g, ' ').trim()
-      .substring(0, 60);
-    if (seen[key]) return false;
-    seen[key] = true;
-    return true;
-  });
-
-  // Mix categories — interleave pinned and scouted by category for variety
-  var byCategory = {};
-  items.forEach(function(item) {
-    var cat = item.category || 'Other';
-    if (!byCategory[cat]) byCategory[cat] = [];
-    byCategory[cat].push(item);
-  });
-  var cats = Object.keys(byCategory);
-  var mixed = [];
-  var maxLen = Math.max.apply(null, cats.map(function(c){return byCategory[c].length;}));
-  for (var i = 0; i < maxLen; i++) {
-    cats.forEach(function(cat) {
-      if (byCategory[cat][i]) mixed.push(byCategory[cat][i]);
-    });
-  }
-  items = mixed;
-
   return items;
 }
 
