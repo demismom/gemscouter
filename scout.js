@@ -1,15 +1,10 @@
 /**
  * Gem Scouter — Scout Runner
  *
- * Automatically fetches pinned items from your eBay collection,
- * plus scouts all 4 categories up to 100 results each.
- *
- * Run locally: node scripts/scout.js
- * In GitHub Actions: runs automatically every hour
- *
- * TO ADD HAND-PICKED ITEMS: just save them to your eBay collection at
- * https://www.ebay.com/inf/gemscouter/collections/101331828749
- * They will appear on the site within an hour automatically.
+ * Sources:
+ * 1. Google Sheet (Fashionphile + other affiliate links)
+ * 2. eBay collection (hand-picked)
+ * 3. eBay API scout (4 categories, 100 each)
  */
 
 require('dotenv').config();
@@ -24,39 +19,115 @@ const CLIENT_SECRET = process.env.EBAY_CLIENT_SECRET;
 const CAMPAIGN_ID   = process.env.EBAY_CAMPAIGN_ID || '5339145706';
 
 const COLLECTION_URL = 'https://www.ebay.com/inf/gemscouter/collections/101331828749';
+const SHEET_CSV_URL  = 'https://docs.google.com/spreadsheets/d/1F6UvmVrAEVbecsfT_yE7nPDib3yEuPix/export?format=csv&gid=1202568340';
 
 const FALLBACK_PINNED_IDS = [
   '336428618001','177934183166','205979855959','177854314498',
   '166210081541','326981617745','306766486521','306816032601',
 ];
 
-const OUT_FILE = path.join(__dirname, 'listings.json');
+const OUT_FILE = path.join(__dirname, '../listings.json');
 
 function log(msg) { console.log('[' + new Date().toISOString() + '] ' + msg); }
 
+// ── 1. Fetch Google Sheet listings ───────────────────────
+async function fetchSheetListings() {
+  log('Fetching Google Sheet affiliate links...');
+  try {
+    const res = await fetch(SHEET_CSV_URL);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const csv = await res.text();
+    const lines = csv.split('\n').filter(Boolean);
+
+    // Skip header row
+    const items = [];
+    for (var i = 1; i < lines.length; i++) {
+      // Parse CSV row (handle quoted fields)
+      const cols = parseCSVRow(lines[i]);
+      // Columns: ID, Title, AffiliateURL, Program, Category, Tags, Price, Status, Notes, ImageURL
+      const id           = (cols[0] || '').trim();
+      const title        = (cols[1] || '').trim();
+      const affiliateUrl = (cols[2] || '').trim();
+      const program      = (cols[3] || '').trim();
+      const category     = (cols[4] || '').trim();
+      const tags         = (cols[5] || '').trim();
+      const priceRaw     = (cols[6] || '').trim();
+      const status       = (cols[7] || '').trim().toLowerCase();
+      // col[8] = Notes (skip)
+      const imageUrl     = (cols[9] || '').trim();
+
+      // Only include active items with required fields
+      if (!title || !affiliateUrl || status !== 'active') continue;
+
+      const price = parseFloat(priceRaw.replace(/[^0-9.]/g, '')) || 0;
+
+      items.push({
+        id: id || 'sheet-' + i,
+        title: title,
+        price: price,
+        priceFormatted: price ? '$' + price.toFixed(2) : '',
+        imageUrl: imageUrl || null,
+        affiliateUrl: affiliateUrl,
+        condition: 'Pre-owned',
+        source: program || 'Affiliate',
+        category: category || 'Jewelry & Accessories',
+        tags: tags ? tags.split(',').map(function(t) { return t.trim(); }) : [],
+        pinned: true,
+        matchLabel: 'Hand-picked',
+        scoutedAt: new Date().toISOString(),
+      });
+    }
+
+    log('  Found ' + items.length + ' active sheet listings');
+    return items;
+  } catch (err) {
+    log('  Sheet fetch failed: ' + err.message);
+    return [];
+  }
+}
+
+function parseCSVRow(row) {
+  var cols = [];
+  var current = '';
+  var inQuotes = false;
+  for (var i = 0; i < row.length; i++) {
+    var c = row[i];
+    if (c === '"') {
+      inQuotes = !inQuotes;
+    } else if (c === ',' && !inQuotes) {
+      cols.push(current);
+      current = '';
+    } else {
+      current += c;
+    }
+  }
+  cols.push(current);
+  return cols;
+}
+
+// ── 2. Fetch eBay collection ──────────────────────────────
 async function fetchCollectionIds() {
-  log('Fetching eBay collection for hand-picked items...');
+  log('Fetching eBay collection...');
   try {
     const res = await fetch(COLLECTION_URL, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.5',
       },
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const html = await res.text();
     const ids = [];
     const pattern = /\/itm\/(\d{12,13})/g;
-    let match;
+    var match;
     while ((match = pattern.exec(html)) !== null) {
       if (!ids.includes(match[1])) ids.push(match[1]);
     }
-    if (!ids.length) throw new Error('No item IDs found');
+    if (!ids.length) throw new Error('No IDs found');
     log('  Found ' + ids.length + ' items in collection');
     return ids;
   } catch (err) {
-    log('  Collection fetch failed: ' + err.message + ' — using fallback IDs');
+    log('  Collection fetch failed: ' + err.message + ' — using fallback');
     return FALLBACK_PINNED_IDS;
   }
 }
@@ -64,10 +135,10 @@ async function fetchCollectionIds() {
 function detectCategory(title) {
   const t = (title || '').toLowerCase();
   if (t.includes('watch') || t.includes('wrist'))         return 'Watches & Timepieces';
-  if (t.includes('glasses') || t.includes('frames') || t.includes('sunglasses') || t.includes('eyewear') || t.includes('spectacles') || t.includes('optical') || t.includes('goggles')) return 'Eyewear & Sunglasses';
-  if (t.includes('painting') || t.includes('oil on') || t.includes('canvas') || t.includes('watercolor'))  return 'Paintings & Original Art';
+  if (t.includes('glasses') || t.includes('frames') || t.includes('sunglasses') || t.includes('eyewear') || t.includes('spectacles') || t.includes('optical')) return 'Eyewear & Sunglasses';
+  if (t.includes('painting') || t.includes('oil on') || t.includes('canvas') || t.includes('watercolor')) return 'Paintings & Original Art';
   if (t.includes('brooch') || t.includes('necklace') || t.includes('bracelet') || t.includes('ring') || t.includes('earring')) return 'Jewelry & Accessories';
-  return 'Vintage & Handmade';
+  return 'Jewelry & Accessories';
 }
 
 function inferTags(title) {
@@ -80,8 +151,10 @@ function inferTags(title) {
   if (t.includes('mechanical')) tags.push('mechanical');
   if (t.includes('handmade'))   tags.push('handmade');
   if (t.includes('signed'))     tags.push('signed');
-  if (t.includes('oil'))        tags.push('oil painting');
-  if (t.includes('folk'))       tags.push('folk art');
+  if (t.includes('gucci'))      tags.push('gucci');
+  if (t.includes('chanel'))     tags.push('chanel');
+  if (t.includes('hermes'))     tags.push('hermes');
+  if (t.includes('burberry'))   tags.push('burberry');
   return [...new Set(tags)];
 }
 
@@ -111,11 +184,14 @@ async function main() {
     process.exit(1);
   }
 
+  // ── Source 1: Google Sheet ────────────────────────────
+  const sheetListings = await fetchSheetListings();
+
+  // ── Source 2: eBay collection ─────────────────────────
   log('Getting eBay OAuth token...');
   const token = await getToken(CLIENT_ID, CLIENT_SECRET);
   log('Token obtained ✓');
 
-  // ── 1. Fetch collection IDs then get full item details ────
   const pinnedIds = await fetchCollectionIds();
   log('Fetching ' + pinnedIds.length + ' pinned items from API...');
 
@@ -123,19 +199,22 @@ async function main() {
     pinnedIds.map(function(id) { return getItem(id, token, CAMPAIGN_ID); })
   );
 
-  const pinned = pinnedResults.map(function(r, i) {
+  const ebayPinned = pinnedResults.map(function(r, i) {
     if (r.status === 'fulfilled' && r.value && r.value.image && r.value.image.imageUrl) {
       log('  ✓ ' + (r.value.title || '').substring(0, 55));
       return normalise(r.value, true);
-    } else {
-      log('  ✗ Item ' + pinnedIds[i] + ': ' + (r.reason && r.reason.message ? r.reason.message : 'no image'));
-      return null;
     }
+    log('  ✗ Item ' + pinnedIds[i] + ': ' + (r.reason && r.reason.message ? r.reason.message : 'no image'));
+    return null;
   }).filter(Boolean);
 
-  log('Pinned: ' + pinned.length + '/' + pinnedIds.length + ' fetched ✓');
+  log('eBay pinned: ' + ebayPinned.length + '/' + pinnedIds.length + ' fetched ✓');
 
-  // ── 2. Scout all 4 categories at 100 each ────────────────
+  // Merge all pinned — sheet first, then eBay collection
+  const allPinned = sheetListings.concat(ebayPinned);
+  log('Total pinned: ' + allPinned.length + ' (' + sheetListings.length + ' sheet + ' + ebayPinned.length + ' eBay)');
+
+  // ── Source 3: eBay scout ──────────────────────────────
   log('\nRunning category scouts...');
   const scouted = [];
 
@@ -155,29 +234,27 @@ async function main() {
       });
       const filtered = filterBatch(raw, query);
       for (var j = 0; j < filtered.length; j++) scouted.push(filtered[j]);
-      log('    ' + raw.length + ' raw \u2192 ' + filtered.length + ' passed filter');
+      log('    ' + raw.length + ' raw → ' + filtered.length + ' passed filter');
       await new Promise(function(r) { setTimeout(r, 400); });
     } catch (err) {
-      log('    \u2717 Failed: ' + err.message);
+      log('    ✗ Failed: ' + err.message);
     }
   }
 
-  // ── 3. Write listings.json ────────────────────────────────
+  // ── Save listings.json ────────────────────────────────
   const output = {
     scoutedAt: new Date().toISOString(),
-    totalPinned: pinned.length,
+    totalPinned: allPinned.length,
     totalScouted: scouted.length,
-    total: pinned.length + scouted.length,
-    pinned: pinned,
+    total: allPinned.length + scouted.length,
+    pinned: allPinned,
     scouted: scouted,
   };
 
   fs.mkdirSync(path.dirname(OUT_FILE), { recursive: true });
   fs.writeFileSync(OUT_FILE, JSON.stringify(output, null, 2));
-  log('\n\u2713 Done \u2014 ' + pinned.length + ' pinned + ' + scouted.length + ' scouted = ' + output.total + ' total gems');
-  log('  Saved to ' + OUT_FILE);
-  log('\nTo add hand-picked items: save listings to your eBay collection at:');
-  log('  ' + COLLECTION_URL);
+  log('\n✓ Done — ' + allPinned.length + ' pinned + ' + scouted.length + ' scouted = ' + output.total + ' total gems');
+  log('  Sheet: ' + sheetListings.length + ' | eBay collection: ' + ebayPinned.length + ' | Scouted: ' + scouted.length);
 }
 
 main().catch(function(err) {
