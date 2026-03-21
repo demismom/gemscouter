@@ -1,9 +1,169 @@
 {
-  "scoutedAt": "2026-03-21T20:54:53.152Z",
-  "totalPinned": 65,
+  "scoutedAt": "2026-03-21T22:51:37.683Z",
+  "totalPinned": 73,
   "totalScouted": 261,
-  "total": 326,
+  "total": 334,
   "pinned": [
+    {
+      "id": "sheet-fp-001",
+      "title": "Gucci Snake Watch 38mm",
+      "price": 355,
+      "priceFormatted": "$355.00",
+      "imageUrl": "https://www.fashionphile.com/cdn/shop/files/43949cbb8b558215557a20bdaa3fc164.jpg?v=1753249460&width=480",
+      "affiliateUrl": "https://mavely.app.link/vpl3IqohH1b",
+      "condition": "Pre-owned",
+      "source": "Fashionphile",
+      "program": "Fashionphile",
+      "category": "Watches & Timepieces",
+      "tags": [
+        "watch",
+        "designer"
+      ],
+      "pinned": true,
+      "matchLabel": "Hand-picked",
+      "location": "",
+      "scoutedAt": "2026-03-21T22:30:58.673Z"
+    },
+    {
+      "id": "sheet-fp-002",
+      "title": "Burberry 26mm Champagne Watch",
+      "price": 310,
+      "priceFormatted": "$310.00",
+      "imageUrl": "",
+      "affiliateUrl": "https://mavely.app.link/nuPZiAmhH1b",
+      "condition": "Pre-owned",
+      "source": "Fashionphile",
+      "program": "Fashionphile",
+      "category": "Watches & Timepieces",
+      "tags": [
+        "watch",
+        "designer"
+      ],
+      "pinned": true,
+      "matchLabel": "Hand-picked",
+      "location": "",
+      "scoutedAt": "2026-03-21T22:30:58.673Z"
+    },
+    {
+      "id": "sheet-fp-003",
+      "title": "Chanel Crystal CC Star Earrings Gold",
+      "price": 325,
+      "priceFormatted": "$325.00",
+      "imageUrl": "",
+      "affiliateUrl": "https://mavely.app.link/Jv5tZtjhH1b",
+      "condition": "Pre-owned",
+      "source": "Fashionphile",
+      "program": "Fashionphile",
+      "category": "Jewelry & Accessories",
+      "tags": [
+        "designer",
+        "earrings"
+      ],
+      "pinned": true,
+      "matchLabel": "Hand-picked",
+      "location": "",
+      "scoutedAt": "2026-03-21T22:30:58.673Z"
+    },
+    {
+      "id": "sheet-fp-004",
+      "title": "David Yurman Diamond Crossover Ring",
+      "price": 315,
+      "priceFormatted": "$315.00",
+      "imageUrl": "",
+      "affiliateUrl": "https://mavely.app.link/QfE7wbhhH1b",
+      "condition": "Pre-owned",
+      "source": "Fashionphile",
+      "program": "Fashionphile",
+      "category": "Jewelry & Accessories",
+      "tags": [
+        "designer",
+        "ring"
+      ],
+      "pinned": true,
+      "matchLabel": "Hand-picked",
+      "location": "",
+      "scoutedAt": "2026-03-21T22:30:58.673Z"
+    },
+    {
+      "id": "sheet-fp-005",
+      "title": "Gucci Enamel Heart Ring Red",
+      "price": 295,
+      "priceFormatted": "$295.00",
+      "imageUrl": "",
+      "affiliateUrl": "https://mavely.app.link/oULWXSehH1b",
+      "condition": "Pre-owned",
+      "source": "Fashionphile",
+      "program": "Fashionphile",
+      "category": "Jewelry & Accessories",
+      "tags": [
+        "designer",
+        "ring"
+      ],
+      "pinned": true,
+      "matchLabel": "Hand-picked",
+      "location": "",
+      "scoutedAt": "2026-03-21T22:30:58.673Z"
+    },
+    {
+      "id": "sheet-fp-006",
+      "title": "Gucci x Adidas Enamel Cuff Bracelet",
+      "price": 315,
+      "priceFormatted": "$315.00",
+      "imageUrl": "",
+      "affiliateUrl": "https://mavely.app.link/QkjMsLdhH1b",
+      "condition": "Pre-owned",
+      "source": "Fashionphile",
+      "program": "Fashionphile",
+      "category": "Jewelry & Accessories",
+      "tags": [
+        "designer",
+        "bracelet"
+      ],
+      "pinned": true,
+      "matchLabel": "Hand-picked",
+      "location": "",
+      "scoutedAt": "2026-03-21T22:30:58.673Z"
+    },
+    {
+      "id": "sheet-fp-007",
+      "title": "Gucci Enamel Interlocking G Ring Blue",
+      "price": 270,
+      "priceFormatted": "$270.00",
+      "imageUrl": "",
+      "affiliateUrl": "https://mavely.app.link/8NfS1ibhH1b",
+      "condition": "Pre-owned",
+      "source": "Fashionphile",
+      "program": "Fashionphile",
+      "category": "Jewelry & Accessories",
+      "tags": [
+        "designer",
+        "ring"
+      ],
+      "pinned": true,
+      "matchLabel": "Hand-picked",
+      "location": "",
+      "scoutedAt": "2026-03-21T22:30:58.673Z"
+    },
+    {
+      "id": "sheet-fp-008",
+      "title": "Hermes Enamel Chaine D'Ancre Bracelet",
+      "price": 180,
+      "priceFormatted": "$180.00",
+      "imageUrl": "",
+      "affiliateUrl": "https://mavely.app.link/HXQSha4gH1b",
+      "condition": "Pre-owned",
+      "source": "Fashionphile",
+      "program": "Fashionphile",
+      "category": "Jewelry & Accessories",
+      "tags": [
+        "designer",
+        "bracelet"
+      ],
+      "pinned": true,
+      "matchLabel": "Hand-picked",
+      "location": "",
+      "scoutedAt": "2026-03-21T22:30:58.673Z"
+    },
     {
       "id": "v1|227123475020|0",
       "title": "Vintage Original Oil Painting Signed E. Othon Friesz",
