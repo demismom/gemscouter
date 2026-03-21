@@ -42,7 +42,7 @@ module.exports = [
     icon: '🖼',
     tags: ['painting', 'original', 'art'],
     query: 'original oil painting signed vintage folk art',
-    categoryId: '360',
+    categoryId: '60437',
     conditions: ['USED'],
     requireOneOf: ['original','signed','oil on canvas','oil on board','acrylic','watercolor','modern','folk art','listed artist','abstract','landscape','hand painted','one of a kind'],
     exclude: ['print','giclee','reproduction','poster','lithograph','lot','canvas print','digital','ai generated','copy','replica'],
