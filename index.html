@@ -109,7 +109,228 @@ footer{background:var(--deep);color:var(--cream);padding:2rem;display:flex;justi
     Gem <span>Scouter</span>
   </a>
   <div class="nav-right">
-    <button class="nav-btn ghost">♡ Saved</button>
+    <button class="nav-btn ghost" id="savedNavBtn" onclick="openSaved()">♡ Saved</button>
+  </div>
+</nav>
+
+<div class="marquee">
+  <div class="marquee-track">
+    <span>No mass production</span><span>No digital prints</span><span>Only handmade</span><span>Only vintage</span><span>Price doesn't signal value</span><span>Art is subjective</span>
+    <span>No mass production</span><span>No digital prints</span><span>Only handmade</span><span>Only vintage</span><span>Price doesn't signal value</span><span>Art is subjective</span>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-eyebrow">Handmade · Vintage · Genuinely yours</div>
+  <h1>Scout for <em>genuine</em> gems.</h1>
+  <p>Rare handmade and vintage finds from across the web. Price never ranks results — your taste does.</p>
+</section>
+
+<div class="filters">
+  <div class="search-wrap">
+    <label>Search</label>
+    <div class="search-row">
+      <input class="search-input" type="text" id="searchInput" placeholder="vintage watch, art deco brooch, hand-thrown vase…">
+      <button class="search-btn" onclick="doSearch()">Scout</button>
+    </div>
+  </div>
+  <div class="filter-group">
+    <label>Category</label>
+    <select id="filterCat" onchange="applyFilters()">
+      <option value="">All categories</option>
+      <option value="Watches & Timepieces">Watches</option>
+      <option value="Paintings & Original Art">Paintings</option>
+      <option value="Jewelry & Accessories">Jewelry</option>
+      <option value="Eyewear & Sunglasses">Eyewear</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label>Price</label>
+    <select id="filterPrice" onchange="applyFilters()">
+      <option value="500">All (max $500)</option>
+      <option value="50">Under $50</option>
+      <option value="100">Under $100</option>
+      <option value="200">Under $200</option>
+      <option value="350">Under $350</option>
+      <option value="500">Under $500</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label>Sort</label>
+    <select id="filterSort" onchange="applyFilters()">
+      <option value="default">Default</option>
+      <option value="price-asc">Price: Low to High</option>
+      <option value="price-desc">Price: High to Low</option>
+    </select>
+  </div>
+</div>
+
+
+
+<div class="results-bar">
+  <div>
+    <div class="results-count" id="resultsCount">Loading gems...</div>
+    <div class="results-sub" id="resultsSub">scouting your collection</div>
+  </div>
+</div>
+
+<div class="grid-wrap">
+  <div id="loadingState" class="loading-state">
+    <p>Scouting for gems...</p>
+  </div>
+  <div id="listingGrid" class="listing-grid" style="display:none;"></div>
+</div>
+
+<footer>
+  <div class="footer-logo">Gem <span>Scouter</span></div>
+  <div class="footer-copy">© 2026 Gem Scouter · Rare finds at every price point</div>
+  <a href="https://sovrn.co/oh6givp" style="font-size:0.6rem;color:rgba(242,236,224,0.2);text-decoration:none;">Urban Outfitters</a>
+</footer>
+
+<script>
+var allListings = [];
+var searchQuery = '';
+
+var FALLBACK = [
+  {id:'336428618001',title:'Dufonte Quartz Watch, Gold Enamel Bezel',price:84.99,imageUrl:'https://i.ebayimg.com/images/g/1uQAAeSwW1VpipPF/s-l600.jpg',tags:['watch','vintage'],affiliateUrl:'https://www.ebay.com/itm/336428618001?campid=5339145706&mkevt=1&mkcid=1&mkrid=711-53200-19255-0',pinned:true,condition:'Pre-owned',category:'Watches & Timepieces'},
+  {id:'177934183166',title:'Carriage Womens Watch, Gold Oval, Brown Leather',price:26.99,imageUrl:'https://i.ebayimg.com/images/g/LJoAAeSw9s1prFVA/s-l600.jpg',tags:['watch','vintage'],affiliateUrl:'https://www.ebay.com/itm/177934183166?campid=5339145706&mkevt=1&mkcid=1&mkrid=711-53200-19255-0',pinned:true,condition:'Pre-owned',category:'Watches & Timepieces'},
+  {id:'205979855959',title:'Bulova Art Deco Cocktail Watch, 10K Gold',price:125.00,imageUrl:'https://i.ebayimg.com/images/g/kuYAAeSwkf1pjeFC/s-l600.jpg',tags:['watch','art deco'],affiliateUrl:'https://www.ebay.com/itm/205979855959?campid=5339145706&mkevt=1&mkcid=1&mkrid=711-53200-19255-0',pinned:true,condition:'Pre-owned',category:'Watches & Timepieces'},
+  {id:'177854314498',title:'Cenere Marcasites Art Deco Cocktail Watch',price:36.99,imageUrl:'https://i.ebayimg.com/images/g/qWgAAeSw~1RpjLNu/s-l600.jpg',tags:['watch','art deco'],affiliateUrl:'https://www.ebay.com/itm/177854314498?campid=5339145706&mkevt=1&mkcid=1&mkrid=711-53200-19255-0',pinned:true,condition:'Pre-owned',category:'Watches & Timepieces'},
+  {id:'166210081541',title:'Antique White GF Deco Watch, Emeralds & Filagree',price:440.00,imageUrl:'https://i.ebayimg.com/images/g/rIIAAOSwHCBkpCMT/s-l600.jpg',tags:['watch','antique'],affiliateUrl:'https://www.ebay.com/itm/166210081541?campid=5339145706&mkevt=1&mkcid=1&mkrid=711-53200-19255-0',pinned:true,condition:'Pre-owned',category:'Watches & Timepieces'},
+  {id:'326981617745',title:'Bulova Art Deco Sterling Silver Wristwatch',price:149.99,imageUrl:'https://i.ebayimg.com/images/g/86YAAeSwdyZpdrTB/s-l600.jpg',tags:['watch','sterling'],affiliateUrl:'https://www.ebay.com/itm/326981617745?campid=5339145706&mkevt=1&mkcid=1&mkrid=711-53200-19255-0',pinned:true,condition:'Pre-owned',category:'Watches & Timepieces'},
+  {id:'306766486521',title:'Art Deco Asymmetrical Watch, Black Leather',price:25.00,imageUrl:'https://i.ebayimg.com/images/g/3X8AAeSwQLZpWwKd/s-l600.jpg',tags:['watch','leather'],affiliateUrl:'https://www.ebay.com/itm/306766486521?campid=5339145706&mkevt=1&mkcid=1&mkrid=711-53200-19255-0',pinned:true,condition:'Pre-owned',category:'Watches & Timepieces'},
+  {id:'306816032601',title:'Art Deco Cocktail Watch, Mother of Pearl Dial',price:21.96,imageUrl:'https://i.ebayimg.com/images/g/s8cAAeSwH1Rpscic/s-l600.jpg',tags:['watch','crystals'],affiliateUrl:'https://www.ebay.com/itm/306816032601?campid=5339145706&mkevt=1&mkcid=1&mkrid=711-53200-19255-0',pinned:true,condition:'Pre-owned',category:'Watches & Timepieces'},
+];
+
+function buildCard(item) {
+  var url = item.affiliateUrl || '#';
+  var price = '$' + parseFloat(item.price||0).toFixed(2);
+  var tags = (item.tags||[]).slice(0,3).map(function(t){
+    return '<span class="mtag">'+t+'</span>';
+  }).join('');
+  var badge = item.pinned ? 'Hand-picked' : 'eBay';
+  var badgeClass = item.pinned ? 'card-badge pinned' : 'card-badge';
+  var imgHtml = item.imageUrl
+    ? '<img class="card-img" src="'+item.imageUrl+'" alt="'+item.title.replace(/"/g,"'")+'" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
+      + '<div class="card-img-placeholder" style="display:none">&#x231A;</div>'
+    : '<div class="card-img-placeholder">&#x231A;</div>';
+
+  return '<div class="card" onclick="window.open(\''+url+'\',\'_blank\')">'
+    + '<div style="position:relative">'
+    + imgHtml
+    + '<span class="'+badgeClass+'">'+badge+'</span>'
+    + '<busave-btn\" onclick=\"event.stopPropagation();toggleSave(this,\\''+item.id+'\\')\">&#x2661;</button>\'html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gem Scouter — Rare Handmade & Vintage Finds</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream:#f2ece0;--deep:#1c1710;--umber:#3d2e1e;--rust:#9e4a28;
+  --ochre:#b8892a;--moss:#5a7052;--stone:#8a8070;--light:#f8f4ec;
+  --border:#d8cfc0;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--light);color:var(--deep);font-family:'Jost',sans-serif;font-weight:300;}
+
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid var(--border);background:var(--light);position:sticky;top:0;z-index:100;}
+.logo{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;text-decoration:none;color:var(--deep);}
+.logo span{color:var(--rust);font-style:italic;}
+.nav-right{display:flex;gap:1rem;align-items:center;}
+.nav-btn{padding:0.4rem 1rem;font-family:'Jost',sans-serif;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all 0.2s;}
+.nav-btn.ghost{background:none;border:1px solid var(--border);color:var(--umber);}
+.nav-btn.ghost:hover{border-color:var(--rust);color:var(--rust);}
+.nav-btn.solid{background:var(--deep);border:1px solid var(--deep);color:var(--cream);}
+.nav-btn.solid:hover{background:var(--rust);border-color:var(--rust);}
+
+/* HERO */
+.hero{padding:3rem 2rem 2rem;text-align:center;border-bottom:1px solid var(--border);}
+.hero-eyebrow{font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--rust);margin-bottom:1rem;}
+.hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2.5rem,5vw,4.5rem);font-weight:300;line-height:1.1;margin-bottom:1rem;}
+.hero h1 em{font-style:italic;color:var(--rust);}
+.hero p{font-size:0.9rem;color:var(--stone);max-width:500px;margin:0 auto 1.5rem;line-height:1.7;}
+
+/* MARQUEE */
+.marquee{background:var(--deep);color:var(--cream);padding:0.7rem 0;overflow:hidden;white-space:nowrap;}
+.marquee-track{display:inline-flex;gap:2.5rem;animation:marquee 25s linear infinite;font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(242,236,224,0.6);}
+.marquee-track span::after{content:'✦';margin-left:2.5rem;color:var(--rust);font-size:0.5rem;}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* FILTERS */
+.filters{padding:1rem 2rem;background:var(--cream);border-bottom:1px solid var(--border);display:flex;gap:0.8rem;align-items:flex-end;flex-wrap:wrap;}
+.filter-group{display:flex;flex-direction:column;gap:0.3rem;}
+.filter-group label{font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--stone);}
+.filter-group select{padding:0.5rem 2rem 0.5rem 0.7rem;border:1px solid var(--border);background:white;font-family:'Jost',sans-serif;font-size:0.8rem;color:var(--deep);border-radius:2px;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='10' height='5' viewBox='0 0 10 5' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l5 5 5-5z' fill='%238a8070'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 0.6rem center;cursor:pointer;outline:none;}
+.filter-group select:focus{border-color:var(--rust);}
+.search-wrap{flex:1;min-width:200px;display:flex;flex-direction:column;gap:0.3rem;}
+.search-wrap label{font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--stone);}
+.search-row{display:flex;gap:0.5rem;}
+.search-input{flex:1;padding:0.5rem 0.8rem;border:1px solid var(--border);background:white;font-family:'Jost',sans-serif;font-size:0.85rem;color:var(--deep);border-radius:2px;outline:none;}
+.search-input:focus{border-color:var(--rust);}
+.search-btn{padding:0.5rem 1.2rem;background:var(--deep);color:var(--cream);border:none;font-family:'Jost',sans-serif;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;border-radius:2px;}
+.search-btn:hover{background:var(--rust);}
+
+/* AESTHETICS BAR */
+
+/* RESULTS */
+.results-bar{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;border-bottom:1px solid var(--border);}
+.results-count{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-style:italic;color:var(--deep);}
+.results-sub{font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--stone);margin-top:0.1rem;}
+.sort-row{display:flex;gap:1rem;}
+.sopt{font-size:0.68rem;letter-spacing:0.08em;color:var(--stone);cursor:pointer;background:none;border:none;border-bottom:1px solid transparent;padding-bottom:1px;font-family:'Jost',sans-serif;transition:all 0.15s;}
+.sopt:hover,.sopt.on{color:var(--rust);border-bottom-color:var(--rust);}
+
+/* GRID — 5 columns, compact cards */
+.grid-wrap{padding:1.2rem 2rem 3rem;}
+.loading-state{text-align:center;padding:4rem;color:var(--stone);}
+.loading-state p{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-style:italic;}
+.listing-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:0.7rem;}
+.card{background:white;border:1px solid var(--border);border-radius:2px;overflow:hidden;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;position:relative;}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(28,23,16,0.1);}
+.card:hover .save-btn{opacity:1;}
+.card-img{width:100%;aspect-ratio:3/2;object-fit:cover;display:block;background:var(--cream);}
+.card-img-placeholder{width:100%;aspect-ratio:3/2;background:linear-gradient(135deg,#2c2418,#b8892a,#e8d5a0);display:flex;align-items:center;justify-content:center;font-size:1.8rem;}
+.card-badge{position:absolute;top:0.4rem;left:0.4rem;background:var(--deep);color:var(--cream);font-size:0.55rem;letter-spacing:0.08em;padding:0.15rem 0.45rem;border-radius:1px;}
+.card-badge.pinned{background:var(--rust);}
+.save-btn{position:absolute;top:0.4rem;right:0.4rem;width:26px;height:26px;background:white;border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s;cursor:pointer;font-size:0.75rem;box-shadow:0 2px 6px rgba(0,0,0,0.15);}
+.card-body{padding:0.6rem 0.7rem 0.7rem;}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:0.85rem;font-weight:400;line-height:1.25;margin-bottom:0.25rem;color:var(--deep);}
+.card-meta{font-size:0.6rem;color:var(--stone);margin-bottom:0.4rem;}
+.card-footer{display:flex;justify-content:space-between;align-items:center;}
+.card-price{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:600;color:var(--deep);}
+.card-tags{display:flex;gap:0.25rem;flex-wrap:wrap;}
+.mtag{font-size:0.58rem;padding:0.1rem 0.35rem;background:var(--cream);border-radius:999px;color:var(--stone);}
+
+/* FOOTER */
+footer{background:var(--deep);color:var(--cream);padding:2rem;display:flex;justify-content:space-between;align-items:center;}
+.footer-logo{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;}
+.footer-logo span{color:var(--rust);font-style:italic;}
+.footer-copy{font-size:0.68rem;color:rgba(242,236,224,0.4);letter-spacing:0.08em;}
+
+@media(max-width:1200px){.listing-grid{grid-template-columns:repeat(4,1fr);}}
+@media(max-width:900px){.listing-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:600px){.listing-grid{grid-template-columns:repeat(2,1fr);}.filters{flex-direction:column;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="#" style="display:flex;align-items:center;gap:0.6rem;">
+    <svg width="24" height="24" viewBox="0 0 32 32" fill="none" style="flex-shrink:0">
+      <polygon points="16,2 28,10 28,22 16,30 4,22 4,10" stroke="#1c1710" stroke-width="1" fill="none"/>
+      <polygon points="16,2 28,10 16,14 4,10" stroke="#9e4a28" stroke-width="0.8" fill="none"/>
+      <line x1="16" y1="14" x2="16" y2="30" stroke="#9e4a28" stroke-width="0.8"/>
+      <line x1="16" y1="14" x2="4" y2="22" stroke="#1c1710" stroke-width="0.5" opacity="0.4"/>
+      <line x1="16" y1="14" x2="28" y2="22" stroke="#1c1710" stroke-width="0.5" opacity="0.4"/>
+    </svg>
+    Gem <span>Scouter</span>
+  </a>
+  <div class="nav-right">
+    <button class="nav-btn ghost" id="savedNavBtn" onclick="openSaved()">♡ Saved</button>
   </div>
 </nav>
 
@@ -297,6 +518,7 @@ function renderGrid() {
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--stone);font-family:Cormorant Garamond,serif;font-style:italic;font-size:1.2rem">No gems found — try broadening your search</div>';
   } else {
     grid.innerHTML = items.map(buildCard).join('');
+  restoreSavedState();
   }
   document.getElementById('resultsCount').textContent = items.length + ' gems found';
 }
@@ -341,7 +563,114 @@ async function loadListings() {
   }
 }
 
+
+// ── SAVE SYSTEM ──────────────────────────────────────────
+var savedIds = JSON.parse(localStorage.getItem('gemscouter_saved') || '[]');
+
+function toggleSave(btn, itemId) {
+  var idx = savedIds.indexOf(itemId);
+  if (idx === -1) {
+    savedIds.push(itemId);
+    btn.innerHTML = '&#x2665;';
+    btn.style.color = 'var(--rust)';
+  } else {
+    savedIds.splice(idx, 1);
+    btn.innerHTML = '&#x2661;';
+    btn.style.color = '';
+  }
+  localStorage.setItem('gemscouter_saved', JSON.stringify(savedIds));
+  updateSavedCount();
+}
+
+function updateSavedCount() {
+  var btn = document.getElementById('savedNavBtn');
+  if (!btn) return;
+  btn.textContent = savedIds.length > 0 ? '♥ Saved (' + savedIds.length + ')' : '♡ Saved';
+  btn.style.color = savedIds.length > 0 ? 'var(--rust)' : '';
+  btn.style.borderColor = savedIds.length > 0 ? 'var(--rust)' : '';
+}
+
+function openSaved() {
+  var panel = document.getElementById('savedPanel');
+  var overlay = document.getElementById('savedOverlay');
+  var list = document.getElementById('savedList');
+  var empty = document.getElementById('savedEmpty');
+  
+  panel.style.display = 'flex';
+  overlay.style.display = 'block';
+  
+  var savedItems = allListings.filter(function(item) {
+    return savedIds.indexOf(item.id) !== -1;
+  });
+  
+  if (!savedItems.length) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  
+  empty.style.display = 'none';
+  list.innerHTML = savedItems.map(function(item) {
+    var price = '$' + parseFloat(item.price||0).toFixed(2);
+    var url = item.affiliateUrl || '#';
+    return '<div style="display:flex;gap:0.8rem;align-items:center;border-bottom:1px solid var(--border);padding-bottom:0.8rem;">'
+      + '<img src="' + (item.imageUrl||'') + '" style="width:60px;height:60px;object-fit:cover;border-radius:2px;flex-shrink:0;" loading="lazy">'
+      + '<div style="flex:1;min-width:0;">'
+      + '<div style="font-size:0.82rem;color:var(--deep);line-height:1.3;margin-bottom:0.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + item.title + '</div>'
+      + '<div style="font-family:Cormorant Garamond,serif;font-size:1rem;font-weight:600;color:var(--deep)">' + price + '</div>'
+      + '</div>'
+      + '<div style="display:flex;flex-direction:column;gap:0.4rem;flex-shrink:0;">'
+      + '<a href="' + url + '" target="_blank" rel="noopener sponsored" style="font-size:0.65rem;letter-spacing:0.08em;padding:0.3rem 0.6rem;background:var(--deep);color:white;text-decoration:none;border-radius:2px;">View</a>'
+      + '<button onclick="removeSaved(\'' + item.id + '\')" style="font-size:0.65rem;letter-spacing:0.08em;padding:0.3rem 0.6rem;background:none;border:1px solid var(--border);cursor:pointer;border-radius:2px;color:var(--stone);">Remove</button>'
+      + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+function closeSaved() {
+  document.getElementById('savedPanel').style.display = 'none';
+  document.getElementById('savedOverlay').style.display = 'none';
+}
+
+function removeSaved(itemId) {
+  savedIds = savedIds.filter(function(id) { return id !== itemId; });
+  localStorage.setItem('gemscouter_saved', JSON.stringify(savedIds));
+  updateSavedCount();
+  // Update heart icon on card if visible
+  document.querySelectorAll('.save-btn').forEach(function(btn) {
+    if (btn.getAttribute('onclick') && btn.getAttribute('onclick').indexOf(itemId) !== -1) {
+      btn.innerHTML = '&#x2661;';
+      btn.style.color = '';
+    }
+  });
+  openSaved(); // refresh panel
+}
+
+// Restore saved state on page load
+function restoreSavedState() {
+  document.querySelectorAll('.save-btn').forEach(function(btn) {
+    var onclick = btn.getAttribute('onclick') || '';
+    var match = onclick.match(/toggleSave\(this,'([^']+)'\)/);
+    if (match && savedIds.indexOf(match[1]) !== -1) {
+      btn.innerHTML = '&#x2665;';
+      btn.style.color = 'var(--rust)';
+    }
+  });
+  updateSavedCount();
+}
+
 loadListings();
 </script>
+
+<!-- SAVED PANEL -->
+<div id="savedPanel" style="display:none;position:fixed;top:0;right:0;width:380px;height:100vh;background:white;border-left:1px solid var(--border);z-index:1000;box-shadow:-4px 0 20px rgba(0,0,0,0.1);overflow-y:auto;flex-direction:column;">
+  <div style="padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-style:italic">Saved Gems</div>
+    <button onclick="closeSaved()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--stone)">✕</button>
+  </div>
+  <div id="savedList" style="padding:1rem 1.5rem;display:flex;flex-direction:column;gap:0.8rem;"></div>
+  <div id="savedEmpty" style="padding:3rem 1.5rem;text-align:center;color:var(--stone);font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.1rem;">No saved gems yet.<br><span style="font-size:0.75rem;font-family:'Jost',sans-serif;font-style:normal">Click ♡ on any item to save it</span></div>
+</div>
+<div id="savedOverlay" onclick="closeSaved()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:999;"></div>
 </body>
 </html>
