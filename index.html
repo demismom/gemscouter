@@ -130,20 +130,19 @@ footer{background:var(--deep);color:var(--cream);padding:2rem;display:flex;justi
     <select id="filterCat" onchange="applyFilters()">
       <option value="">All categories</option>
       <option value="Watches & Timepieces">Watches</option>
-      <option value="Ceramics & Pottery">Ceramics</option>
       <option value="Paintings & Original Art">Paintings</option>
       <option value="Jewelry & Accessories">Jewelry</option>
       <option value="Eyewear">Eyewear</option>
-      <option value="Textiles & Fiber Arts">Textiles</option>
     </select>
   </div>
   <div class="filter-group">
     <label>Price</label>
     <select id="filterPrice" onchange="applyFilters()">
-      <option value="">Any price</option>
+      <option value="500">All (max $500)</option>
       <option value="50">Under $50</option>
-      <option value="150">Under $150</option>
-      <option value="300">Under $300</option>
+      <option value="100">Under $100</option>
+      <option value="200">Under $200</option>
+      <option value="350">Under $350</option>
       <option value="500">Under $500</option>
     </select>
   </div>
@@ -221,11 +220,13 @@ function buildCard(item) {
 
 function getFiltered() {
   var cat = document.getElementById('filterCat').value;
-  var maxPrice = parseFloat(document.getElementById('filterPrice').value)||Infinity;
+  var maxPrice = parseFloat(document.getElementById('filterPrice').value)||500;
   var sort = document.getElementById('filterSort').value;
   var q = searchQuery.toLowerCase();
 
+  var EXCLUDED = ['Ceramics & Pottery','Textiles & Fiber Arts'];
   var items = allListings.filter(function(item) {
+    if (EXCLUDED.indexOf(item.category) !== -1) return false;
     if (cat && item.category !== cat) return false;
     if (item.price > maxPrice) return false;
     if (q && item.title.toLowerCase().indexOf(q) === -1) return false;
