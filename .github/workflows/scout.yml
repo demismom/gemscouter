@@ -6,7 +6,8 @@ on:
   push:
     branches: [main]
     paths:
-      - 'scripts/**'
+      - 'scout.js'
+      - 'scout-queries.js'
   workflow_dispatch:
 
 jobs:
