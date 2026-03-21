@@ -64,7 +64,7 @@ async function fetchCollectionIds() {
 function detectCategory(title) {
   const t = (title || '').toLowerCase();
   if (t.includes('watch') || t.includes('wrist'))         return 'Watches & Timepieces';
-  if (t.includes('glasses') || t.includes('frames') || t.includes('sunglasses') || t.includes('eyewear')) return 'Eyewear & Sunglasses';
+  if (t.includes('glasses') || t.includes('frames') || t.includes('sunglasses') || t.includes('eyewear') || t.includes('spectacles') || t.includes('optical') || t.includes('goggles')) return 'Eyewear & Sunglasses';
   if (t.includes('painting') || t.includes('oil on') || t.includes('canvas') || t.includes('watercolor'))  return 'Paintings & Original Art';
   if (t.includes('brooch') || t.includes('necklace') || t.includes('bracelet') || t.includes('ring') || t.includes('earring')) return 'Jewelry & Accessories';
   return 'Vintage & Handmade';
