@@ -57,7 +57,7 @@ module.exports = [
     icon: '🕶',
     tags: ['eyewear', 'vintage', 'frames'],
     query: 'vintage eyeglasses sunglasses frames 1960s 1970s',
-    categoryId: '175759',
+    categoryId: '56185',
     conditions: ['USED'],
     requireOneOf: ['vintage','antique','deadstock','nos','art deco','mid century','1950s','1960s','1970s','gold filled','tortoise','acetate','optical','bausch','ray ban','cat eye'],
     exclude: ['lot','wholesale','replica','brand new','cheap','broken','parts'],
