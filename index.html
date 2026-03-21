@@ -161,6 +161,10 @@ footer{background:var(--deep);color:var(--cream);padding:2rem;display:flex;justi
       <option value="price-desc">Price: High to Low</option>
     </select>
   </div>
+  <div class="filter-group" style="justify-content:flex-end;">
+    <label>&nbsp;</label>
+    <button class="search-btn" onclick="resetFilters()" style="background:none;border:1px solid var(--border);color:var(--stone);padding:0.5rem 0.9rem;">&#x21BA; Reset</button>
+  </div>
 </div>
 
 <div class="results-bar">
@@ -395,6 +399,16 @@ function renderGrid() {
     : '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--stone);font-family:\'Cormorant Garamond\',serif;font-style:italic;font-size:1.2rem">No gems found — try broadening your search</div>';
   document.getElementById('resultsCount').textContent = items.length + ' gems found';
   restoreSavedState();
+}
+
+function resetFilters() {
+  document.getElementById('filterCat').value = '';
+  document.getElementById('filterHandpicked').value = '';
+  document.getElementById('filterPrice').value = '500';
+  document.getElementById('filterSort').value = 'default';
+  document.getElementById('searchInput').value = '';
+  searchQuery = '';
+  renderGrid();
 }
 
 function applyFilters() { renderGrid(); }
