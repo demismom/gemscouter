@@ -44,7 +44,7 @@ module.exports = [
     query: 'original canvas painting vintage',
     categoryId: '60437',
     conditions: ['USED'],
-    requireOneOf: ['original','signed','oil on canvas','oil on board','acrylic','watercolor','modern','folk art','listed artist','abstract','landscape','hand painted','one of a kind'],
+    requireOneOf: ['neoclassical','romantic','impressionist','expressionist','modernist','original','signed','oil on canvas','oil on board','acrylic','watercolor','modern','folk art','listed artist','abstract','landscape','hand painted','one of a kind'],
     exclude: ['print','giclee','reproduction','poster','lithograph','lot','canvas print','digital','ai generated','copy','replica'],
     priceMin: 10,
     priceMax: 500,
