@@ -19,7 +19,7 @@ const CLIENT_SECRET = process.env.EBAY_CLIENT_SECRET;
 const CAMPAIGN_ID   = process.env.EBAY_CAMPAIGN_ID || '5339145706';
 
 const COLLECTION_URL = 'https://www.ebay.com/inf/gemscouter/collections/101331828749';
-const SHEET_CSV_URL  = 'https://docs.google.com/spreadsheets/d/1F6UvmVrAEVbecsfT_yE7nPDib3yEuPix/export?format=csv&gid=1202568340';
+const SHEET_CSV_URL  = 'https://docs.google.com/spreadsheets/d/1R0PmBS_kJsgU8uvewGm8JHzLphEcUHwDQWraSAOwiFY';
 
 const FALLBACK_PINNED_IDS = [
   '336428618001','177934183166','205979855959','177854314498',
