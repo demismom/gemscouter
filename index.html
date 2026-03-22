@@ -375,20 +375,71 @@ function dedupeItems(items) {
   });
 }
 
+function seededRand(seed) {
+  // Simple deterministic shuffle so order stays stable per page load but varies day to day
+  var s = seed;
+  return function() {
+    s = (s * 1664525 + 1013904223) & 0xffffffff;
+    return (s >>> 0) / 0xffffffff;
+  };
+}
+
 function shuffleMix(items) {
+  var rand = seededRand(Math.floor(Date.now() / 3600000)); // changes every hour
+
+  // Split into hand-picked and scouted
+  var pinned = items.filter(function(i) { return i.pinned; });
+  var scouted = items.filter(function(i) { return !i.pinned; });
+
+  // Sort pinned by price ascending (cheaper first), with slight randomness within price bands
+  // Price bands: <$50, $50-150, $150-300, $300+
+  function priceBand(p) {
+    if (p < 50)  return 0;
+    if (p < 150) return 1;
+    if (p < 300) return 2;
+    return 3;
+  }
+  pinned.sort(function(a, b) {
+    var bandDiff = priceBand(a.price) - priceBand(b.price);
+    if (bandDiff !== 0) return bandDiff;
+    // Within same band, randomise
+    return rand() - 0.5;
+  });
+
+  // Interleave pinned by category so variety shows up top
   var byCategory = {};
-  items.forEach(function(item) {
+  pinned.forEach(function(item) {
     var cat = item.category || 'other';
     if (!byCategory[cat]) byCategory[cat] = [];
     byCategory[cat].push(item);
   });
   var cats = Object.values(byCategory);
-  var mixed = [];
+  var mixedPinned = [];
   var maxLen = Math.max.apply(null, cats.map(function(c) { return c.length; }));
   for (var i = 0; i < maxLen; i++) {
-    cats.forEach(function(cat) { if (cat[i]) mixed.push(cat[i]); });
+    cats.forEach(function(cat) { if (cat[i]) mixedPinned.push(cat[i]); });
   }
-  return mixed;
+
+  // Shuffle scouted by category interleave + randomness
+  var scoutedByCat = {};
+  scouted.forEach(function(item) {
+    var cat = item.category || 'other';
+    if (!scoutedByCat[cat]) scoutedByCat[cat] = [];
+    scoutedByCat[cat].push(item);
+  });
+  // Shuffle within each category
+  Object.values(scoutedByCat).forEach(function(arr) {
+    arr.sort(function() { return rand() - 0.5; });
+  });
+  var scoutedCats = Object.values(scoutedByCat);
+  var mixedScouted = [];
+  var scoutMax = Math.max.apply(null, scoutedCats.map(function(c) { return c.length; }));
+  for (var j = 0; j < scoutMax; j++) {
+    scoutedCats.forEach(function(cat) { if (cat[j]) mixedScouted.push(cat[j]); });
+  }
+
+  // Hand-picked first (low price → high, varied by category), then scouted
+  return mixedPinned.concat(mixedScouted);
 }
 
 function renderGrid() {
