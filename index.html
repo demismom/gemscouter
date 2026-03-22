@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gem Scouter — Rare Handmade & Vintage Finds</title>
+<meta name="description" content="Curated vintage and handmade finds — watches, jewelry, paintings, eyewear. No mass production, no dropshipping. Just genuine gems.">
+<meta property="og:title" content="Gem Scouter — Rare Handmade & Vintage Finds">
+<meta property="og:description" content="Curated vintage and handmade finds at every price point.">
+<meta property="og:url" content="https://gemscouter.com">
+<meta property="og:type" content="website">
+<meta name="pinterest-rich-pin" content="true">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23f8f4ec'/%3E%3Cpolygon points='16,2 28,10 28,22 16,30 4,22 4,10' stroke='%231c1710' stroke-width='1' fill='none'/%3E%3Cpolygon points='16,2 28,10 16,14 4,10' stroke='%239e4a28' stroke-width='0.8' fill='none'/%3E%3Cline x1='16' y1='14' x2='16' y2='30' stroke='%239e4a28' stroke-width='0.8'/%3E%3Cline x1='16' y1='14' x2='4' y2='22' stroke='%231c1710' stroke-width='0.5' opacity='0.4'/%3E%3Cline x1='16' y1='14' x2='28' y2='22' stroke='%231c1710' stroke-width='0.5' opacity='0.4'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
@@ -86,6 +92,28 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
 .saved-remove-btn{font-size:0.65rem;padding:0.3rem 0.6rem;background:none;border:1px solid var(--border);cursor:pointer;border-radius:2px;color:var(--stone);}
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:999;}
 .overlay.open{display:block;}
+/* ── ITEM MODAL ── */
+.item-modal{display:none;position:fixed;inset:0;z-index:1100;align-items:center;justify-content:center;padding:1.5rem;}
+.item-modal.open{display:flex;}
+.item-modal-box{background:white;border:1px solid var(--border);border-radius:2px;max-width:780px;width:100%;max-height:90vh;overflow-y:auto;position:relative;box-shadow:0 20px 60px rgba(28,23,16,0.2);}
+.item-modal-close{position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--stone);z-index:10;line-height:1;}
+.item-modal-close:hover{color:var(--deep);}
+.item-modal-inner{display:grid;grid-template-columns:1fr 1fr;min-height:400px;}
+.item-modal-img{aspect-ratio:1;object-fit:cover;width:100%;display:block;background:var(--cream);}
+.item-modal-img-placeholder{aspect-ratio:1;background:linear-gradient(135deg,#2c2418,#b8892a,#e8d5a0);display:flex;align-items:center;justify-content:center;font-size:3rem;}
+.item-modal-info{padding:2rem;display:flex;flex-direction:column;gap:1rem;}
+.item-modal-badge{font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:white;background:var(--rust);padding:0.2rem 0.6rem;border-radius:1px;align-self:flex-start;}
+.item-modal-badge.scouted{background:var(--deep);}
+.item-modal-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;line-height:1.3;color:var(--deep);}
+.item-modal-price{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:600;color:var(--deep);}
+.item-modal-meta{font-size:0.75rem;color:var(--stone);line-height:1.8;}
+.item-modal-tags{display:flex;gap:0.4rem;flex-wrap:wrap;}
+.item-modal-cta{display:block;padding:0.9rem 1.5rem;background:var(--rust);color:white;text-decoration:none;font-family:'Jost',sans-serif;font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;text-align:center;border-radius:2px;transition:background 0.2s;margin-top:auto;}
+.item-modal-cta:hover{background:var(--umber);}
+.item-modal-share{display:flex;gap:0.5rem;margin-top:0.5rem;}
+.item-modal-share-btn{flex:1;padding:0.5rem;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--border);background:none;cursor:pointer;border-radius:2px;color:var(--stone);font-family:'Jost',sans-serif;}
+.item-modal-share-btn:hover{border-color:var(--rust);color:var(--rust);}
+@media(max-width:600px){.item-modal-inner{grid-template-columns:1fr;}.item-modal-img{aspect-ratio:3/2;}}
 footer{background:var(--deep);color:var(--cream);padding:2rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;}
 .footer-logo{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;}
 .footer-logo span{color:var(--rust);font-style:italic;}
@@ -186,6 +214,28 @@ footer{background:var(--deep);color:var(--cream);padding:2rem;display:flex;justi
 <div class="grid-wrap">
   <div id="loadingState" class="loading-state"><p>Scouting for gems&hellip;</p></div>
   <div id="listingGrid" class="listing-grid" style="display:none;"></div>
+</div>
+
+<!-- Item Modal -->
+<div id="itemModal" class="item-modal" onclick="if(event.target===this)closeItemModal()">
+  <div class="item-modal-box">
+    <button class="item-modal-close" onclick="closeItemModal()">&#x2715;</button>
+    <div class="item-modal-inner">
+      <div id="itemModalImg"></div>
+      <div class="item-modal-info">
+        <div id="itemModalBadge" class="item-modal-badge"></div>
+        <div id="itemModalTitle" class="item-modal-title"></div>
+        <div id="itemModalPrice" class="item-modal-price"></div>
+        <div id="itemModalMeta" class="item-modal-meta"></div>
+        <div id="itemModalTags" class="item-modal-tags"></div>
+        <a id="itemModalCta" class="item-modal-cta" href="#" target="_blank" rel="noopener sponsored">View &amp; Buy</a>
+        <div class="item-modal-share">
+          <button class="item-modal-share-btn" onclick="copyItemLink()">&#x1F517; Copy Link</button>
+          <button class="item-modal-share-btn" onclick="pinToPinterest()">&#x1F4CC; Pin It</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div id="savedPanel" class="saved-panel">
@@ -334,7 +384,7 @@ function buildCard(item) {
     : '<div class="card-img-placeholder">&#x231A;</div>';
 
   return [
-    '<div class="card" onclick="window.open(\'' + url + '\',\'_blank\')">',
+    '<div class="card" onclick="openItemModal(\'' + item.id + '\')">', 
       '<div style="position:relative">',
         imgHtml,
         '<span class="' + badgeClass + '">' + badge + '</span>',
@@ -512,8 +562,106 @@ async function loadListings() {
   }
 }
 
+// ── ITEM MODAL ────────────────────────────────────────────
+
+function openItemModal(itemId) {
+  var item = allListings.find(function(i) { return i.id === itemId; });
+  if (!item) return;
+
+  var imgUrl = item.imageUrl ? item.imageUrl.replace('http://', 'https://') : '';
+  var imgEl = document.getElementById('itemModalImg');
+  imgEl.innerHTML = imgUrl
+    ? '<img class="item-modal-img" src="' + imgUrl + '" alt="' + item.title + '">'
+    : '<div class="item-modal-img-placeholder">&#x231A;</div>';
+
+  var badge = item.pinned ? (item.source && item.source !== 'eBay' ? item.source : 'Hand-picked') : 'Scouted';
+  var badgeEl = document.getElementById('itemModalBadge');
+  badgeEl.textContent = badge;
+  badgeEl.className = 'item-modal-badge' + (item.pinned ? '' : ' scouted');
+
+  document.getElementById('itemModalTitle').textContent = item.title;
+  document.getElementById('itemModalPrice').textContent = '$' + parseFloat(item.price || 0).toFixed(2);
+
+  var meta = [];
+  if (item.condition) meta.push(item.condition);
+  if (item.location) meta.push(item.location);
+  if (item.category) meta.push(item.category);
+  document.getElementById('itemModalMeta').textContent = meta.join(' · ');
+
+  document.getElementById('itemModalTags').innerHTML = (item.tags || []).slice(0, 5).map(function(t) {
+    return '<span class="mtag">' + t + '</span>';
+  }).join('');
+
+  var cta = document.getElementById('itemModalCta');
+  cta.href = item.affiliateUrl || '#';
+  var source = item.source || 'eBay';
+  cta.textContent = 'View on ' + source + ' →';
+
+  document.getElementById('itemModal').classList.add('open');
+  document.getElementById('savedOverlay').classList.add('open');
+
+  // Update URL so this page is shareable / pinnable
+  history.pushState({ itemId: itemId }, '', '?item=' + encodeURIComponent(itemId));
+
+  // Track in GA
+  if (typeof gtag !== 'undefined') {
+    gtag('event', 'view_item', { item_id: itemId, item_name: item.title });
+  }
+}
+
+function closeItemModal() {
+  document.getElementById('itemModal').classList.remove('open');
+  document.getElementById('savedOverlay').classList.remove('open');
+  history.pushState({}, '', '/');
+}
+
+function copyItemLink() {
+  navigator.clipboard.writeText(window.location.href).then(function() {
+    var btn = event.target;
+    btn.textContent = '✓ Copied!';
+    setTimeout(function() { btn.textContent = '🔗 Copy Link'; }, 2000);
+  });
+}
+
+function pinToPinterest() {
+  var item = allListings.find(function(i) {
+    return window.location.search.includes(encodeURIComponent(i.id));
+  });
+  if (!item) return;
+  var pageUrl = encodeURIComponent(window.location.href);
+  var imgUrl = encodeURIComponent(item.imageUrl || '');
+  var desc = encodeURIComponent(item.title + ' — $' + parseFloat(item.price || 0).toFixed(2) + ' · Found on Gem Scouter');
+  window.open('https://pinterest.com/pin/create/button/?url=' + pageUrl + '&media=' + imgUrl + '&description=' + desc, '_blank');
+}
+
+// Handle browser back/forward and direct item URLs
+window.addEventListener('popstate', function(e) {
+  if (e.state && e.state.itemId) {
+    openItemModal(e.state.itemId);
+  } else {
+    document.getElementById('itemModal').classList.remove('open');
+    document.getElementById('savedOverlay').classList.remove('open');
+  }
+});
+
+function checkUrlForItem() {
+  var params = new URLSearchParams(window.location.search);
+  var itemId = params.get('item');
+  if (itemId) {
+    // Wait for listings to load then open modal
+    var attempts = 0;
+    var interval = setInterval(function() {
+      var item = allListings.find(function(i) { return i.id === itemId; });
+      if (item || attempts++ > 20) {
+        clearInterval(interval);
+        if (item) openItemModal(itemId);
+      }
+    }, 200);
+  }
+}
+
 updateSavedCount();
-loadListings();
+loadListings().then(checkUrlForItem);
 
 </script>
 </body>
