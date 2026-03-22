@@ -26,7 +26,7 @@ const FALLBACK_PINNED_IDS = [
   '166210081541','326981617745','306766486521','306816032601',
 ];
 
-const OUT_FILE = path.join(__dirname, '../listings.json');
+const OUT_FILE = path.join(__dirname, 'listings.json');
 
 function log(msg) { console.log('[' + new Date().toISOString() + '] ' + msg); }
 
