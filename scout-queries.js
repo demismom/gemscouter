@@ -73,7 +73,7 @@ module.exports = [
     query: 'vintage sunglasses',
     categoryId: '79720',
     conditions: ['USED'],
-    requireOneOf: ['vintage','antique','deadstock','nos','art deco','mid century','1950s','1960s','1970s','gold filled','tortoise','acetate','optical','bausch','ray ban','cat eye'],
+    requireOneOf: ['shirt','vintage','antique','deadstock','nos','art deco','mid century','1950s','1960s','1970s','gold filled','tortoise','acetate','optical','bausch','ray ban','cat eye'],
     exclude: ['kids','childrens','lot','wholesale','replica','brand new','cheap','broken','parts'],
     priceMin: 10,
     priceMax: 500,
