@@ -92,6 +92,6 @@ module.exports = [
     priceMin: 15,
     priceMax: 500,
     limit: 100,
-  },
+  }
 
 ];
