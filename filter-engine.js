@@ -1,6 +1,7 @@
 /**
  * Gem Scouter — Filter & Scoring Engine
  * Scores each listing 0–100 for likely authenticity
+ * trusted: true queries skip keyword + feedback filters
  */
 
 function filterAndScore(item, query) {
@@ -11,13 +12,15 @@ function filterAndScore(item, query) {
   // ── Hard filters ──────────────────────────────────────────
   if (!item.image?.imageUrl) return null;
   if (!price) return null;
-  if (feedbackPct < 95) return null;
 
-  // Exclude disqualifying keywords
+  // Feedback filter — skip for trusted sellers
+  if (!query.trusted && feedbackPct < 95) return null;
+
+  // Exclude disqualifying keywords (always applied)
   if (query.exclude?.some(w => title.includes(w.toLowerCase()))) return null;
 
-  // Must match at least one authenticity keyword
-  if (query.requireOneOf?.length) {
+  // Must match at least one authenticity keyword — skip for trusted sellers
+  if (!query.trusted && query.requireOneOf?.length) {
     if (!query.requireOneOf.some(w => title.includes(w.toLowerCase()))) return null;
   }
 
@@ -26,7 +29,7 @@ function filterAndScore(item, query) {
   if (query.priceMax && price > query.priceMax) return null;
 
   // ── Authenticity score ────────────────────────────────────
-  let score = 50;
+  let score = query.trusted ? 70 : 50;  // trusted sellers start higher
 
   const boosts = [
     { words: ['signed', 'artist signed'],                    pts: 15 },
@@ -68,11 +71,12 @@ function filterAndScore(item, query) {
     affiliateUrl: item.itemAffiliateWebUrl || item.itemWebUrl,
     condition: item.condition || 'Pre-owned',
     source: 'eBay',
-    category: query.label,
+    category: query.label.split(' —')[0].trim(), // strip seller name from label
     categoryId: query.id,
     categoryIcon: query.icon,
     tags: query.tags || [],
     authenticityScore: score,
+    trusted: query.trusted || false,
     matchLabel: score >= 85 ? 'Strong match' : score >= 70 ? 'Good match' : 'Explore',
     location: item.itemLocation?.city || '',
     pinned: false,
@@ -81,10 +85,16 @@ function filterAndScore(item, query) {
 }
 
 function filterBatch(items, query) {
-  return items
+  const results = items
     .map(i => filterAndScore(i, query))
     .filter(Boolean)
     .sort((a, b) => b.authenticityScore - a.authenticityScore);
+
+  // For broad scouts, trim to keepTop
+  if (!query.trusted && query.keepTop) {
+    return results.slice(0, query.keepTop);
+  }
+  return results;
 }
 
 module.exports = { filterBatch };
