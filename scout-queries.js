@@ -10,7 +10,7 @@
 // ── Trusted eBay sellers by category ─────────────────────
 const TRUSTED_SELLERS = {
   eyewear:  ['sunglassmuseum'],
-  jewelry:  ['jewelry4you', 'electriccityvintage', 'iridescentantiquesandoddities', 'mykroz-3', 'homedecordistributors'],
+  jewelry:  ['jewelry4you', 'electriccityvintage', 'mykroz-3', 'homedecordistributors'],
   watches:  ['timekeepersco', 'keepwatchin'],
   mixed:    [],   // reserved for multi-category sellers
 };
