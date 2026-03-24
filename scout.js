@@ -231,6 +231,7 @@ async function main() {
         priceMax: query.priceMax,
         conditions: query.conditions,
         sellers: query.sellers || [],
+        trusted: query.trusted || false,
         limit: query.limit,
         campaignId: CAMPAIGN_ID,
       });
