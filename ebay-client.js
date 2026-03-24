@@ -51,7 +51,7 @@ async function getItem(itemId, token, campaignId) {
   return response.json();
 }
 
-async function searchItems({ token, query, categoryId, priceMin, priceMax, conditions = ['USED'], limit = 20, campaignId }) {
+async function searchItems({ token, query, categoryId, priceMin, priceMax, conditions = ['USED'], sellers = [], limit = 20, campaignId }) {
   const url = new URL(`${EBAY_API_BASE}/buy/browse/v1/item_summary/search`);
 
   const filters = [
@@ -62,6 +62,10 @@ async function searchItems({ token, query, categoryId, priceMin, priceMax, condi
 
   if (priceMin != null || priceMax != null) {
     filters.push(`price:[${priceMin || 0}..${priceMax || 10000}]`);
+  }
+
+  if (sellers && sellers.length > 0) {
+    filters.push(`sellers:{${sellers.join('|')}}`);
   }
 
   url.searchParams.set('q', query);
