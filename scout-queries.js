@@ -18,93 +18,14 @@ const TRUSTED_SELLERS = {
 module.exports = [
 
   // ══════════════════════════════════════════════════════
-  // BROAD SCOUTS — full filter engine, keep top 10 per run
+  // BROAD SCOUTS — disabled for now, re-enable when ready
   // ══════════════════════════════════════════════════════
 
-  {
-    id: 'watches',
-    label: 'Watches & Timepieces',
-    icon: '⌚',
-    tags: ['watch', 'vintage'],
-    trusted: false,
-    query: 'vintage watch',
-    categoryId: '31387',
-    conditions: ['USED'],
-    requireOneOf: ['20s','40s','50s','60s','70s','bracelet','mechanical','automatic','hand-wind','manual wind','vintage','antique','swiss','art deco','1900s','timepiece','rare','gem'],
-    exclude: ['disney','casio','kids','childrens','lot','parts','repair','broken','replica','smartwatch','digital','fitbit','apple','wholesale'],
-    priceMin: 15,
-    priceMax: 500,
-    limit: 100,
-    keepTop: 10,
-  },
-
-  {
-    id: 'jewelry',
-    label: 'Jewelry & Accessories',
-    icon: '💍',
-    tags: ['jewelry', 'vintage'],
-    trusted: false,
-    query: 'vintage jewelry',
-    categoryId: '48579',
-    conditions: ['USED'],
-    requireOneOf: ['20s','40s','50s','60s','70s','vintage','antique','handmade','art deco','art nouveau','sterling','rare','gem','filigree','bakelite','enamel','mid century','folk','one of a kind','studio'],
-    exclude: ['disney','dish','case','barbie','doll','kids','childrens','lot','wholesale','replica','fashion jewelry','costume lot','mass','factory','brooch','broach','vase','box','organizer','holder','lapel'],
-    priceMin: 10,
-    priceMax: 500,
-    limit: 100,
-    keepTop: 10,
-  },
-
-  {
-    id: 'paintings',
-    label: 'Paintings & Original Art',
-    icon: '🖼',
-    tags: ['painting', 'original', 'art'],
-    trusted: false,
-    query: 'original canvas painting vintage',
-    categoryId: '60437',
-    conditions: ['USED'],
-    requireOneOf: ['20s','40s','50s','60s','70s','unique','fauvism','neoclassical','romantic','impressionist','expressionist','modernist','original','signed','oil on canvas','oil on board','acrylic','watercolor','modern','folk art','listed artist','abstract','landscape','hand painted','one of a kind'],
-    exclude: ['disney','print','giclee','reproduction','poster','lithograph','lot','canvas print','digital','ai generated','copy','replica'],
-    priceMin: 10,
-    priceMax: 500,
-    limit: 100,
-    keepTop: 10,
-  },
-
-  {
-    id: 'eyewear',
-    label: 'Eyewear & Sunglasses',
-    icon: '🕶',
-    tags: ['eyewear', 'vintage', 'frames'],
-    trusted: false,
-    query: 'vintage eyeglasses',
-    categoryId: '56185',
-    conditions: ['USED'],
-    requireOneOf: ['20s','40s','50s','60s','70s','vintage','antique','deadstock','nos','art deco','mid century','1950s','1960s','1970s','gold filled','tortoise','acetate','optical','bausch','ray ban','cat eye'],
-    exclude: ['disney','shirt','kids','childrens','lot','wholesale','replica','brand new','cheap','broken','parts'],
-    priceMin: 10,
-    priceMax: 500,
-    limit: 100,
-    keepTop: 10,
-  },
-
-  {
-    id: 'eyewear',
-    label: 'Eyewear & Sunglasses',
-    icon: '🕶',
-    tags: ['eyewear', 'vintage', 'frames'],
-    trusted: false,
-    query: 'vintage sunglasses',
-    categoryId: '79720',
-    conditions: ['USED'],
-    requireOneOf: ['20s','40s','50s','60s','70s','vintage','antique','deadstock','nos','art deco','mid century','1950s','1960s','1970s','gold filled','tortoise','acetate','optical','bausch','ray ban','cat eye'],
-    exclude: ['disney','shirt','kids','childrens','lot','wholesale','replica','brand new','cheap','broken','parts'],
-    priceMin: 10,
-    priceMax: 500,
-    limit: 100,
-    keepTop: 10,
-  },
+  // { id: 'watches', trusted: false, query: 'vintage watch', categoryId: '31387', ... },
+  // { id: 'jewelry', trusted: false, query: 'vintage jewelry', categoryId: '48579', ... },
+  // { id: 'paintings', trusted: false, query: 'original canvas painting vintage', categoryId: '60437', ... },
+  // { id: 'eyewear', trusted: false, query: 'vintage eyeglasses', categoryId: '56185', ... },
+  // { id: 'eyewear', trusted: false, query: 'vintage sunglasses', categoryId: '79720', ... },
 
   // ══════════════════════════════════════════════════════
   // TRUSTED SELLER SCOUTS — skip keyword filter, price only
