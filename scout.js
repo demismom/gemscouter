@@ -229,6 +229,7 @@ async function main() {
         priceMin: query.priceMin,
         priceMax: query.priceMax,
         conditions: query.conditions,
+        sellers: query.sellers || [],
         limit: query.limit,
         campaignId: CAMPAIGN_ID,
       });
