@@ -1,18 +1,13 @@
 /**
  * Gem Scouter — Scout Query Definitions
- * Categories: Watches, Jewelry, Paintings, Eyewear
- * Max price: $500
- *
- * trusted: true  → skips keyword/feedback filters, pulls from specific sellers
- * trusted: false → broad scout, full filter engine applied, limit 100 then trim to 10
+ * Trusted queries MUST have sellers defined — empty sellers = query is skipped
  */
 
-// ── Trusted eBay sellers by category ─────────────────────
 const TRUSTED_SELLERS = {
-  eyewear:  ['sunglassmuseum'],
-  jewelry:  ['jewelry4you', 'electriccityvintage',],
-  watches:  ['timekeepersco', 'keepwatchin'],
-  paintings: ['homedecordistributors']
+  eyewear:   ['sunglassmuseum'],
+  jewelry:   ['jewelry4you', 'electriccityvintage'],
+  watches:   ['timekeepersco', 'keepwatchin'],
+  paintings: ['homedecordistributors'],
 };
 
 module.exports = [
@@ -28,7 +23,7 @@ module.exports = [
   // { id: 'eyewear', trusted: false, query: 'vintage sunglasses', categoryId: '79720', ... },
 
   // ══════════════════════════════════════════════════════
-  // TRUSTED SELLER SCOUTS — skip keyword filter, price only
+  // TRUSTED SELLER SCOUTS — only these sellers, no broad search
   // ══════════════════════════════════════════════════════
 
   {
@@ -37,7 +32,7 @@ module.exports = [
     icon: '🕶',
     tags: ['eyewear', 'vintage', 'frames'],
     trusted: true,
-    query: 'vintage sunglasses',
+    query: 'vintage',
     categoryId: null,
     conditions: ['USED', 'NEW'],
     sellers: TRUSTED_SELLERS.eyewear,
@@ -81,22 +76,22 @@ module.exports = [
     priceMax: 500,
     limit: 100,
   },
+
   {
     id: 'paintings',
-    label: 'Paintings',
+    label: 'Paintings & Original Art',
     icon: '🖼',
-    tags: ['paintings', 'vintage','original'],
+    tags: ['painting', 'vintage', 'original'],
     trusted: true,
-    query: 'paintings',
+    query: 'vintage',
     categoryId: null,
     conditions: ['USED'],
     sellers: TRUSTED_SELLERS.paintings,
-    requireOneOf: ['painting'],
+    requireOneOf: [],
     exclude: ['print','giclee','reproduction','poster','lithograph','lot','canvas print','digital','ai generated','copy','replica'],
     priceMin: 15,
     priceMax: 500,
     limit: 100,
   },
-
 
 ];
