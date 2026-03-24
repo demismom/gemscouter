@@ -23,7 +23,7 @@ function filterAndScore(item, query) {
   // Exclude disqualifying keywords (always applied)
   if (query.exclude && query.exclude.some(function(w) { return title.includes(w.toLowerCase()); })) return null;
 
-  // Always require vintage/vtg — applies to ALL queries including trusted sellers
+  // Require vintage/vtg for all queries — broad and trusted
   if (!VINTAGE_WORDS.some(function(w) { return title.includes(w); })) return null;
 
   // Additional keyword filter for broad (non-trusted) scouts
