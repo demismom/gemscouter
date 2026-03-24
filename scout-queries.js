@@ -12,8 +12,7 @@ const TRUSTED_SELLERS = {
   eyewear:  ['sunglassmuseum'],
   jewelry:  ['jewelry4you', 'electriccityvintage',],
   watches:  ['timekeepersco', 'keepwatchin'],
-  paintings: ['homedecordistributors'],
-  mixed:    [],   // reserved for multi-category sellers
+  paintings: ['homedecordistributors']
 };
 
 module.exports = [
@@ -92,7 +91,7 @@ module.exports = [
     categoryId: null,
     conditions: ['USED'],
     sellers: TRUSTED_SELLERS.paintings,
-    requireOneOf: [],
+    requireOneOf: ['painting'],
     exclude: ['print','giclee','reproduction','poster','lithograph','lot','canvas print','digital','ai generated','copy','replica'],
     priceMin: 15,
     priceMax: 500,
