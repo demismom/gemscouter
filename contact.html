@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — Gem Scouter</title>
+<meta name="description" content="Get in touch with Gem Scouter. Questions, suggestions, or just want to say hello.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23f8f4ec'/%3E%3Cpolygon points='16,2 28,10 28,22 16,30 4,22 4,10' stroke='%231c1710' stroke-width='1' fill='none'/%3E%3Cpolygon points='16,2 28,10 16,14 4,10' stroke='%239e4a28' stroke-width='0.8' fill='none'/%3E%3Cline x1='16' y1='14' x2='16' y2='30' stroke='%239e4a28' stroke-width='0.8'/%3E%3Cline x1='16' y1='14' x2='4' y2='22' stroke='%231c1710' stroke-width='0.5' opacity='0.4'/%3E%3Cline x1='16' y1='14' x2='28' y2='22' stroke='%231c1710' stroke-width='0.5' opacity='0.4'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-T6EKBNCFKJ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-T6EKBNCFKJ');
+</script>
+<style>
+:root{--cream:#f2ece0;--deep:#1c1710;--umber:#3d2e1e;--rust:#9e4a28;--stone:#8a8070;--light:#f8f4ec;--border:#d8cfc0;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--light);color:var(--deep);font-family:'Jost',sans-serif;font-weight:300;min-height:100vh;display:flex;flex-direction:column;}
+nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid var(--border);background:var(--light);position:sticky;top:0;z-index:100;}
+.logo{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;text-decoration:none;color:var(--deep);display:flex;align-items:center;gap:0.6rem;}
+.logo span{color:var(--rust);font-style:italic;}
+.nav-btn{padding:0.4rem 1rem;font-family:'Jost',sans-serif;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all 0.2s;background:none;border:1px solid var(--border);color:var(--umber);text-decoration:none;display:inline-block;}
+.nav-btn:hover{border-color:var(--rust);color:var(--rust);}
+.marquee{background:var(--deep);padding:0.7rem 0;overflow:hidden;white-space:nowrap;}
+.marquee-track{display:inline-flex;gap:2.5rem;animation:marquee 25s linear infinite;font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(242,236,224,0.6);}
+.marquee-track span::after{content:'✦';margin-left:2.5rem;color:var(--rust);font-size:0.5rem;}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.page-hero{padding:3rem 2rem 2.5rem;text-align:center;border-bottom:1px solid var(--border);}
+.hero-eyebrow{font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--rust);margin-bottom:1rem;}
+.page-hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4vw,3.5rem);font-weight:300;line-height:1.1;margin-bottom:1rem;}
+.page-hero h1 em{font-style:italic;color:var(--rust);}
+.page-hero p{font-size:0.9rem;color:var(--stone);max-width:460px;margin:0 auto;line-height:1.7;}
+.contact-wrap{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:3rem 2rem 4rem;gap:4rem;flex-wrap:wrap;}
+.contact-info{max-width:260px;}
+.contact-info h2{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;margin-bottom:1rem;}
+.contact-info p{font-size:0.85rem;color:var(--stone);line-height:1.8;margin-bottom:1.5rem;}
+.contact-detail{display:flex;flex-direction:column;gap:0.8rem;}
+.contact-detail-item{display:flex;flex-direction:column;gap:0.2rem;}
+.contact-detail-label{font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--rust);}
+.contact-detail-value{font-size:0.85rem;color:var(--deep);}
+.divider{width:40px;height:1px;background:var(--border);margin:1.5rem 0;}
+.contact-form-wrap{width:100%;max-width:520px;}
+.contact-form{display:flex;flex-direction:column;gap:1.2rem;}
+.form-group{display:flex;flex-direction:column;gap:0.4rem;}
+.form-group label{font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--stone);}
+.form-group input,
+.form-group select,
+.form-group textarea{padding:0.7rem 0.9rem;border:1px solid var(--border);background:white;font-family:'Jost',sans-serif;font-size:0.85rem;color:var(--deep);border-radius:2px;outline:none;transition:border-color 0.2s;width:100%;}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus{border-color:var(--rust);}
+.form-group textarea{resize:vertical;min-height:140px;line-height:1.6;}
+.form-group select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='10' height='5' viewBox='0 0 10 5' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l5 5 5-5z' fill='%238a8070'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 0.8rem center;cursor:pointer;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.submit-btn{padding:0.9rem 2rem;background:var(--rust);color:white;border:none;font-family:'Jost',sans-serif;font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:background 0.2s;align-self:flex-start;}
+.submit-btn:hover{background:var(--umber);}
+.submit-btn:disabled{background:var(--stone);cursor:not-allowed;}
+.success-msg{display:none;padding:1.2rem 1.5rem;background:white;border:1px solid var(--border);border-left:3px solid var(--rust);border-radius:2px;}
+.success-msg p{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-style:italic;color:var(--deep);margin-bottom:0.3rem;}
+.success-msg small{font-size:0.75rem;color:var(--stone);}
+footer{background:var(--deep);color:var(--cream);padding:2rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-top:auto;}
+.footer-logo{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;}
+.footer-logo span{color:var(--rust);font-style:italic;}
+.footer-copy{font-size:0.68rem;color:rgba(242,236,224,0.4);letter-spacing:0.08em;}
+@media(max-width:700px){.form-row{grid-template-columns:1fr;}.contact-wrap{gap:2rem;}.contact-info{max-width:100%;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="/">
+    <svg width="22" height="22" viewBox="0 0 32 32" fill="none" style="flex-shrink:0">
+      <polygon points="16,2 28,10 28,22 16,30 4,22 4,10" stroke="#1c1710" stroke-width="1" fill="none"/>
+      <polygon points="16,2 28,10 16,14 4,10" stroke="#9e4a28" stroke-width="0.8" fill="none"/>
+      <line x1="16" y1="14" x2="16" y2="30" stroke="#9e4a28" stroke-width="0.8"/>
+      <line x1="16" y1="14" x2="4" y2="22" stroke="#1c1710" stroke-width="0.5" opacity="0.4"/>
+      <line x1="16" y1="14" x2="28" y2="22" stroke="#1c1710" stroke-width="0.5" opacity="0.4"/>
+    </svg>
+    Gem <span>Scouter</span>
+  </a>
+  <a class="nav-btn" href="/">&#8592; Back to finds</a>
+</nav>
+
+<div class="marquee">
+  <div class="marquee-track">
+    <span>No mass production</span><span>No digital prints</span><span>Only handmade</span><span>Only vintage</span><span>Price doesn't signal value</span><span>Art is subjective</span>
+    <span>No mass production</span><span>No digital prints</span><span>Only handmade</span><span>Only vintage</span><span>Price doesn't signal value</span><span>Art is subjective</span>
+  </div>
+</div>
+
+<section class="page-hero">
+  <div class="hero-eyebrow">We'd love to hear from you</div>
+  <h1>Get in <em>touch.</em></h1>
+  <p>Questions about a find, suggestions for what to scout next, or just want to say hello — we're here.</p>
+</section>
+
+<div class="contact-wrap">
+
+  <div class="contact-info">
+    <h2>Say hello</h2>
+    <p>Gem Scouter is a small, curated shop. Every message goes directly to a real person who cares about finding great things.</p>
+    <div class="divider"></div>
+    <div class="contact-detail">
+      <div class="contact-detail-item">
+        <span class="contact-detail-label">Email</span>
+        <span class="contact-detail-value"><a href="mailto:info@gemscouter.com" style="color:var(--deep);text-decoration:none;">info@gemscouter.com</a></span>
+      </div>
+      <div class="contact-detail-item">
+        <span class="contact-detail-label">Response time</span>
+        <span class="contact-detail-value">Usually within 24 hours</span>
+      </div>
+      <div class="contact-detail-item">
+        <span class="contact-detail-label">Website</span>
+        <span class="contact-detail-value"><a href="/" style="color:var(--rust);text-decoration:none;">gemscouter.com</a></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="contact-form-wrap">
+    <div id="successMsg" class="success-msg">
+      <p>Message received — thank you!</p>
+      <small>We'll get back to you within 24 hours.</small>
+    </div>
+    <form class="contact-form" id="contactForm"
+          action="https://formspree.io/f/xdawqdgr"
+          method="POST">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="name">Your name</label>
+          <input type="text" id="name" name="name" placeholder="Jane Smith" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email address</label>
+          <input type="email" id="email" name="email" placeholder="jane@example.com" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="subject">Subject</label>
+        <select id="subject" name="subject">
+          <option value="">Select a topic</option>
+          <option value="Question about a listing">Question about a listing</option>
+          <option value="Suggest a find">Suggest a find</option>
+          <option value="Partnership or affiliate">Partnership or affiliate</option>
+          <option value="Technical issue">Technical issue</option>
+          <option value="General hello">General hello</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="message">Message</label>
+        <textarea id="message" name="message" placeholder="Tell us what's on your mind…" required></textarea>
+      </div>
+      <input type="hidden" name="_replyto" value="info@gemscouter.com">
+      <input type="text" name="_gotcha" style="display:none">
+      <div style="display:flex;gap:0.8rem;align-items:center;flex-wrap:wrap;">
+        <button type="submit" class="submit-btn" id="submitBtn">Send message</button>
+        <a href="mailto:info@gemscouter.com" style="font-size:0.72rem;color:var(--stone);text-decoration:none;letter-spacing:0.08em;">or email us directly &#8594;</a>
+      </div>
+    </form>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo">Gem <span>Scouter</span></div>
+  <div class="footer-copy">&copy; 2026 Gem Scouter &middot; Rare finds at every price point</div>
+  <div style="width:100%;font-size:0.62rem;color:rgba(242,236,224,0.35);line-height:1.6;padding-top:1rem;border-top:1px solid rgba(242,236,224,0.1);letter-spacing:0.04em;">
+    As an Amazon Associate I earn from qualifying purchases. Gem Scouter also uses affiliate links from eBay and other partners. We may earn a small commission on purchases made through our links, at no extra cost to you.
+  </div>
+</footer>
+
+<script>
+var form = document.getElementById('contactForm');
+var submitBtn = document.getElementById('submitBtn');
+var successMsg = document.getElementById('successMsg');
+
+form.addEventListener('submit', function(e) {
+  e.preventDefault();
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Sending…';
+
+  fetch(form.action, {
+    method: 'POST',
+    body: new FormData(form),
+    headers: { 'Accept': 'application/json' }
+  }).then(function(res) {
+    if (res.ok) {
+      form.style.display = 'none';
+      successMsg.style.display = 'block';
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'contact_form_submit');
+      }
+    } else {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send message';
+      alert('Something went wrong. Please email us directly at info@gemscouter.com');
+    }
+  }).catch(function() {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Send message';
+    alert('Something went wrong. Please email us directly at info@gemscouter.com');
+  });
+});
+</script>
+</body>
+</html>
