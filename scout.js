@@ -216,7 +216,8 @@ async function main() {
 
   // ── Source 3: eBay scout ──────────────────────────────
   log('\nRunning category scouts...');
-  const scouted = [];
+  const trustedScouted = [];
+  const broadScouted = [];
 
   for (var i = 0; i < QUERIES.length; i++) {
     var query = QUERIES[i];
@@ -234,7 +235,11 @@ async function main() {
         campaignId: CAMPAIGN_ID,
       });
       const filtered = filterBatch(raw, query);
-      for (var j = 0; j < filtered.length; j++) scouted.push(filtered[j]);
+      if (query.trusted) {
+        for (var j = 0; j < filtered.length; j++) trustedScouted.push(filtered[j]);
+      } else {
+        for (var k = 0; k < filtered.length; k++) broadScouted.push(filtered[k]);
+      }
       log('    ' + raw.length + ' raw → ' + filtered.length + ' passed filter');
       await new Promise(function(r) { setTimeout(r, 400); });
     } catch (err) {
@@ -242,20 +247,23 @@ async function main() {
     }
   }
 
+  // Order: handpicked → trusted sellers → broad scouted
+  const allScouted = trustedScouted.concat(broadScouted);
+
   // ── Save listings.json ────────────────────────────────
   const output = {
     scoutedAt: new Date().toISOString(),
     totalPinned: allPinned.length,
-    totalScouted: scouted.length,
-    total: allPinned.length + scouted.length,
+    totalScouted: allScouted.length,
+    total: allPinned.length + allScouted.length,
     pinned: allPinned,
-    scouted: scouted,
+    scouted: allScouted,
   };
 
   fs.mkdirSync(path.dirname(OUT_FILE), { recursive: true });
   fs.writeFileSync(OUT_FILE, JSON.stringify(output, null, 2));
-  log('\n✓ Done — ' + allPinned.length + ' pinned + ' + scouted.length + ' scouted = ' + output.total + ' total gems');
-  log('  Sheet: ' + sheetListings.length + ' | eBay collection: ' + ebayPinned.length + ' | Scouted: ' + scouted.length);
+  log('\n✓ Done — ' + allPinned.length + ' pinned + ' + allScouted.length + ' scouted = ' + output.total + ' total gems');
+  log('  Sheet: ' + sheetListings.length + ' | eBay collection: ' + ebayPinned.length + ' | Trusted: ' + trustedScouted.length + ' | Broad: ' + broadScouted.length);
 }
 
 main().catch(function(err) {
