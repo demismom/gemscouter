@@ -7,7 +7,7 @@ const TRUSTED_SELLERS = {
   eyewear:   ['sunglassmuseum'],
   jewelry:   ['jewelry4you', 'electriccityvintage'],
   watches:   ['timekeepersco', 'keepwatchin'],
-  paintings: ['homedecordistributors'],
+  paintings: ['homedecordistributors']
 };
 
 module.exports = [
