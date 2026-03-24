@@ -394,7 +394,7 @@ function buildCard(item) {
       '</div>',
       '<div class="card-body">',
         '<div class="card-title">' + item.title + '</div>',
-        '<div class="card-meta">' + (item.condition || 'Pre-owned') + (item.location ? ' · ' + item.location : '') + '</div>',
+        '<div class="card-meta">' + (item.condition && item.condition.toLowerCase().indexOf('new') === -1 ? item.condition : '') + (item.location ? ' · ' + item.location : '') + '</div>',
         '<div class="card-footer"><div class="card-price">' + price + '</div><div class="card-tags">' + tags + '</div></div>',
       '</div>',
     '</div>'
@@ -569,8 +569,9 @@ function openItemModal(itemId) {
   document.getElementById('itemModalTitle').textContent = item.title;
   document.getElementById('itemModalPrice').textContent = '$' + parseFloat(item.price || 0).toFixed(2);
 
+  var cond = item.condition && item.condition.toLowerCase().indexOf('new') === -1 ? item.condition : '';
   var meta = [];
-  if (item.condition) meta.push(item.condition);
+  if (cond) meta.push(cond);
   if (item.location) meta.push(item.location);
   if (item.category) meta.push(item.category);
   document.getElementById('itemModalMeta').textContent = meta.join(' · ');
