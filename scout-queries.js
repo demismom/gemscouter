@@ -82,21 +82,6 @@ module.exports = [
     limit: 100,
   },
 
-  {
-    id: 'jewelry',
-    label: 'Jewelry & Accessories',
-    icon: '💍',
-    tags: ['jewelry', 'vintage'],
-    trusted: true,
-    query: 'vintage',
-    categoryId: null,
-    conditions: ['USED', 'NEW'],
-    sellers: TRUSTED_SELLERS.mixed,
-    requireOneOf: [],
-    exclude: ['lot','wholesale','replica','broken','parts'],
-    priceMin: 10,
-    priceMax: 500,
-    limit: 100,
-  },
+
 
 ];
