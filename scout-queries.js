@@ -12,7 +12,7 @@ const TRUSTED_SELLERS = {
   eyewear:  ['sunglassmuseum'],
   jewelry:  ['jewelry4you', 'electriccityvintage', 'iridescentantiquesandoddities', 'mykroz-3', 'homedecordistributors'],
   watches:  ['timekeepersco', 'keepwatchin'],
-  mixed:    ['shopfront7'],
+  mixed:    [],   // reserved for multi-category sellers
 };
 
 module.exports = [
