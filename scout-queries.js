@@ -2,9 +2,21 @@
  * Gem Scouter — Scout Query Definitions
  * Categories: Watches, Jewelry, Paintings, Eyewear
  * Max price: $500 · Limit: 100 per category
+ *
+ * Trusted sellers are scouts that run in addition to broad queries,
+ * pulling all USED items from a specific seller filtered by category + price.
  */
 
+// ── Trusted eBay sellers by category ─────────────────────
+const TRUSTED_SELLERS = {
+  eyewear:  ['sunglassmuseum'],
+  jewelry:  ['jewelry4you', 'electriccityvintage'],
+  watches:  ['timekeepersco'],
+};
+
 module.exports = [
+
+  // ── Broad category scouts ─────────────────────────────
 
   {
     id: 'watches',
@@ -65,7 +77,8 @@ module.exports = [
     priceMax: 500,
     limit: 100,
   },
-    {
+
+  {
     id: 'eyewear',
     label: 'Eyewear & Sunglasses',
     icon: '🕶',
@@ -76,6 +89,75 @@ module.exports = [
     requireOneOf: ['20s','40s','50s','60s','70s','vintage','antique','deadstock','nos','art deco','mid century','1950s','1960s','1970s','gold filled','tortoise','acetate','optical','bausch','ray ban','cat eye'],
     exclude: ['disney','shirt','kids','childrens','lot','wholesale','replica','brand new','cheap','broken','parts'],
     priceMin: 10,
+    priceMax: 500,
+    limit: 100,
+  },
+
+  // ── Trusted seller scouts ─────────────────────────────
+  // These pull all USED items from specific trusted sellers,
+  // filtered by category ID and price only (no keyword filter needed
+  // since these sellers stock only vintage/quality items).
+
+  {
+    id: 'eyewear',
+    label: 'Eyewear & Sunglasses — sunglassmuseum',
+    icon: '🕶',
+    tags: ['eyewear', 'vintage', 'frames'],
+    query: 'sunglasses',
+    categoryId: '79720',
+    conditions: ['USED'],
+    sellers: TRUSTED_SELLERS.eyewear,
+    requireOneOf: [],   // trust the seller — no keyword filter
+    exclude: ['lot','wholesale','broken','parts','replica'],
+    priceMin: 10,
+    priceMax: 500,
+    limit: 100,
+  },
+
+  {
+    id: 'jewelry',
+    label: 'Jewelry & Accessories — jewelry4you',
+    icon: '💍',
+    tags: ['jewelry', 'vintage'],
+    query: 'jewelry',
+    categoryId: '48579',
+    conditions: ['USED'],
+    sellers: ['jewelry4you'],
+    requireOneOf: [],
+    exclude: ['lot','wholesale','replica','broken','parts'],
+    priceMin: 10,
+    priceMax: 500,
+    limit: 100,
+  },
+
+  {
+    id: 'jewelry',
+    label: 'Jewelry & Accessories — electriccityvintage',
+    icon: '💍',
+    tags: ['jewelry', 'vintage'],
+    query: 'jewelry',
+    categoryId: '48579',
+    conditions: ['USED'],
+    sellers: ['electriccityvintage'],
+    requireOneOf: [],
+    exclude: ['lot','wholesale','replica','broken','parts'],
+    priceMin: 10,
+    priceMax: 500,
+    limit: 100,
+  },
+
+  {
+    id: 'watches',
+    label: 'Watches & Timepieces — timekeepersco',
+    icon: '⌚',
+    tags: ['watch', 'vintage'],
+    query: 'watch',
+    categoryId: '31387',
+    conditions: ['USED'],
+    sellers: ['timekeepersco'],
+    requireOneOf: [],
+    exclude: ['lot','wholesale','replica','broken','parts','smartwatch','digital','fitbit','apple'],
+    priceMin: 15,
     priceMax: 500,
     limit: 100,
   },
