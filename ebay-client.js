@@ -51,11 +51,30 @@ async function getItem(itemId, token, campaignId) {
   return response.json();
 }
 
-async function searchItems({ token, query, categoryId, priceMin, priceMax, conditions = ['USED'], sellers = [], limit = 20, campaignId }) {
+async function searchItems({ token, query, categoryId, priceMin, priceMax, conditions = ['USED'], sellers = [], limit = 20, campaignId, trusted = false }) {
+
+  // Safety guard — never run a trusted query without sellers, it would return all of eBay
+  if (trusted && (!sellers || sellers.length === 0)) {
+    console.log('  Skipped — trusted query with no sellers defined');
+    return [];
+  }
+
   const url = new URL(`${EBAY_API_BASE}/buy/browse/v1/item_summary/search`);
 
+  // eBay condition filter values
+  const CONDITION_MAP = {
+    'NEW':          '1000',
+    'USED':         '3000',
+    'UNGRADED':     '10',
+    'PRE_OWNED':    '3000',
+  };
+
+  const conditionIds = conditions.map(function(c) {
+    return CONDITION_MAP[c] || c;
+  });
+
   const filters = [
-    `conditions:{${conditions.join('|')}}`,
+    `conditionIds:{${conditionIds.join('|')}}`,
     'itemLocationCountry:US',
     'buyingOptions:{FIXED_PRICE}',
   ];
