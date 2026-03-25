@@ -493,7 +493,9 @@ function shuffleMix(items) {
 
 function renderGrid() {
   var grid = document.getElementById('listingGrid');
-  var items = shuffleMix(dedupeItems(getFiltered()));
+  var sort = document.getElementById('filterSort').value;
+  var filtered = dedupeItems(getFiltered());
+  var items = (sort === 'default') ? shuffleMix(filtered) : filtered;
   grid.innerHTML = items.length
     ? items.map(buildCard).join('')
     : '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--stone);font-family:\'Cormorant Garamond\',serif;font-style:italic;font-size:1.2rem">No gems found — try broadening your search</div>';
