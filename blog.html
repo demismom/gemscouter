@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Gem Scouter Journal — Vintage Finds, Stories & Guides</title>
+<meta name="description" content="Stories, guides and finds from the world of vintage jewelry, watches, art and eyewear. Written by the team at Gem Scouter.">
+<meta property="og:title" content="The Gem Scouter Journal">
+<meta property="og:description" content="Stories, guides and finds from the world of vintage jewelry, watches, art and eyewear.">
+<meta property="og:url" content="https://gemscouter.com/blog.html">
+<meta property="og:type" content="website">
+<meta name="p:domain_verify" content="9e6172605ea6c6c8d6d50e1624ad078a">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23f8f4ec'/%3E%3Cpolygon points='16,2 28,10 28,22 16,30 4,22 4,10' stroke='%231c1710' stroke-width='1' fill='none'/%3E%3Cpolygon points='16,2 28,10 16,14 4,10' stroke='%239e4a28' stroke-width='0.8' fill='none'/%3E%3Cline x1='16' y1='14' x2='16' y2='30' stroke='%239e4a28' stroke-width='0.8'/%3E%3Cline x1='16' y1='14' x2='4' y2='22' stroke='%231c1710' stroke-width='0.5' opacity='0.4'/%3E%3Cline x1='16' y1='14' x2='28' y2='22' stroke='%231c1710' stroke-width='0.5' opacity='0.4'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-T6EKBNCFKJ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-T6EKBNCFKJ');
+</script>
+<style>
+:root{--cream:#f2ece0;--deep:#1c1710;--umber:#3d2e1e;--rust:#9e4a28;--stone:#8a8070;--light:#f8f4ec;--border:#d8cfc0;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--light);color:var(--deep);font-family:'Jost',sans-serif;font-weight:300;min-height:100vh;display:flex;flex-direction:column;}
+nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid var(--border);background:var(--light);position:sticky;top:0;z-index:100;gap:0.5rem;flex-wrap:wrap;}
+.logo{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;text-decoration:none;color:var(--deep);display:flex;align-items:center;gap:0.6rem;}
+.logo span{color:var(--rust);font-style:italic;}
+.nav-btn{padding:0.4rem 1rem;font-family:'Jost',sans-serif;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all 0.2s;background:none;border:1px solid var(--border);color:var(--umber);text-decoration:none;display:inline-block;}
+.nav-btn:hover{border-color:var(--rust);color:var(--rust);}
+.marquee{background:var(--deep);padding:0.7rem 0;overflow:hidden;white-space:nowrap;}
+.marquee-track{display:inline-flex;gap:2.5rem;animation:marquee 25s linear infinite;font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(242,236,224,0.6);}
+.marquee-track span::after{content:'✦';margin-left:2.5rem;color:var(--rust);font-size:0.5rem;}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.page-hero{padding:3rem 2rem 2.5rem;text-align:center;border-bottom:1px solid var(--border);}
+.hero-eyebrow{font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--rust);margin-bottom:1rem;}
+.page-hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4vw,3.5rem);font-weight:300;line-height:1.1;margin-bottom:1rem;}
+.page-hero h1 em{font-style:italic;color:var(--rust);}
+.page-hero p{font-size:0.9rem;color:var(--stone);max-width:460px;margin:0 auto;line-height:1.7;}
+.blog-wrap{flex:1;max-width:1100px;margin:0 auto;padding:3rem 2rem 4rem;width:100%;}
+.blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;}
+.post-card{background:white;border:1px solid var(--border);border-radius:2px;overflow:hidden;transition:transform 0.2s,box-shadow 0.2s;text-decoration:none;color:inherit;display:flex;flex-direction:column;}
+.post-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(28,23,16,0.08);}
+.post-card-img{width:100%;aspect-ratio:3/2;object-fit:cover;display:block;background:var(--cream);}
+.post-card-img-placeholder{width:100%;aspect-ratio:3/2;background:linear-gradient(135deg,var(--deep),var(--umber));display:flex;align-items:center;justify-content:center;}
+.post-card-body{padding:1.2rem 1.4rem 1.5rem;flex:1;display:flex;flex-direction:column;gap:0.5rem;}
+.post-tag{font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--rust);}
+.post-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:400;line-height:1.3;color:var(--deep);}
+.post-excerpt{font-size:0.82rem;color:var(--stone);line-height:1.7;flex:1;}
+.post-meta{font-size:0.65rem;color:var(--stone);letter-spacing:0.05em;margin-top:0.3rem;}
+.post-read-more{font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--rust);margin-top:0.8rem;}
+footer{background:var(--deep);color:var(--cream);padding:2rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-top:auto;}
+.footer-logo{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;}
+.footer-logo span{color:var(--rust);font-style:italic;}
+.footer-copy{font-size:0.68rem;color:rgba(242,236,224,0.4);letter-spacing:0.08em;}
+@media(max-width:900px){.blog-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:600px){.blog-grid{grid-template-columns:1fr;}.nav-btn{font-size:0.65rem;padding:0.35rem 0.7rem;}.logo{font-size:1.2rem;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="/">
+    <svg width="22" height="22" viewBox="0 0 32 32" fill="none" style="flex-shrink:0">
+      <polygon points="16,2 28,10 28,22 16,30 4,22 4,10" stroke="#1c1710" stroke-width="1" fill="none"/>
+      <polygon points="16,2 28,10 16,14 4,10" stroke="#9e4a28" stroke-width="0.8" fill="none"/>
+      <line x1="16" y1="14" x2="16" y2="30" stroke="#9e4a28" stroke-width="0.8"/>
+      <line x1="16" y1="14" x2="4" y2="22" stroke="#1c1710" stroke-width="0.5" opacity="0.4"/>
+      <line x1="16" y1="14" x2="28" y2="22" stroke="#1c1710" stroke-width="0.5" opacity="0.4"/>
+    </svg>
+    Gem <span>Scouter</span>
+  </a>
+  <div style="display:flex;gap:0.6rem;align-items:center;">
+    <a class="nav-btn" href="/">&#8592; Browse finds</a>
+    <a class="nav-btn" href="/contact.html">Contact</a>
+  </div>
+</nav>
+
+<div class="marquee">
+  <div class="marquee-track">
+    <span>No mass production</span><span>No digital prints</span><span>Only handmade</span><span>Only vintage</span><span>Price doesn't signal value</span><span>Art is subjective</span>
+    <span>No mass production</span><span>No digital prints</span><span>Only handmade</span><span>Only vintage</span><span>Price doesn't signal value</span><span>Art is subjective</span>
+  </div>
+</div>
+
+<section class="page-hero">
+  <div class="hero-eyebrow">Stories &middot; Guides &middot; Finds</div>
+  <h1>The Gem Scouter <em>Journal</em></h1>
+  <p>Guides, stories and ideas from the world of vintage jewelry, watches, original art and eyewear.</p>
+</section>
+
+<div class="blog-wrap">
+  <div class="blog-grid" id="blogGrid">
+
+    <a class="post-card" href="/blog/top-7-vintage-charm-bracelets.html">
+      <img class="post-card-img" src="https://i.ebayimg.com/images/g/MhIAAeSwu8RptMva/s-l1600.jpg" alt="Vintage charm bracelets" loading="lazy">
+      <div class="post-card-body">
+        <div class="post-tag">Jewelry</div>
+        <div class="post-title">Top 7 Vintage Charm Bracelets Worth Collecting Right Now</div>
+        <div class="post-excerpt">From book lovers' locket bracelets to art deco gold-filled heirlooms — seven genuine vintage charm bracelets across every budget, with affiliate links to shop each one.</div>
+        <div class="post-meta">March 2026</div>
+        <div class="post-read-more">Read &rarr;</div>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo">Gem <span>Scouter</span></div>
+  <div class="footer-copy">&copy; 2026 Gem Scouter &middot; Rare finds at every price point</div>
+  <div style="width:100%;font-size:0.62rem;color:rgba(242,236,224,0.35);line-height:1.6;padding-top:1rem;border-top:1px solid rgba(242,236,224,0.1);letter-spacing:0.04em;">
+    As an Amazon Associate I earn from qualifying purchases. Gem Scouter also uses affiliate links from eBay and other partners. We may earn a small commission on purchases made through our links, at no extra cost to you.
+  </div>
+</footer>
+
+</body>
+</html>
