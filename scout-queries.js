@@ -5,7 +5,7 @@
 
 const TRUSTED_SELLERS = {
   eyewear:   ['sunglassmuseum'],
-  jewelry:   ['jewelry4you', 'electriccityvintage', 'hamzagemsandjewery'],
+  jewelry:   ['jewelry4you', 'electriccityvintage'],
   watches:   ['timekeepersco', 'keepwatchin','vfashion86'],
 };
 
@@ -39,7 +39,7 @@ module.exports = [
     exclude: ['lot','wholesale','broken','parts','replica'],
     priceMin: 10,
     priceMax: 500,
-    limit: 100,
+    limit: 120,
   },
 
   {
@@ -56,7 +56,7 @@ module.exports = [
     exclude: ['lot','wholesale','replica','broken','parts'],
     priceMin: 10,
     priceMax: 500,
-    limit: 100,
+    limit: 150,
   },
 
   {
@@ -73,7 +73,7 @@ module.exports = [
     exclude: ['lot','wholesale','replica','broken','parts','smartwatch','digital','fitbit','apple'],
     priceMin: 15,
     priceMax: 500,
-    limit: 100,
+    limit: 120,
   },
 
 
