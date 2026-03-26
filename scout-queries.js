@@ -5,7 +5,7 @@
 
 const TRUSTED_SELLERS = {
   eyewear:   ['sunglassmuseum'],
-  jewelry:   ['jewelry4you', 'electriccityvintage'],
+  jewelry:   ['jewelry4you', 'electriccityvintage', 'hamzagemsandjewery'],
   watches:   ['timekeepersco', 'keepwatchin','vfashion86'],
 };
 
