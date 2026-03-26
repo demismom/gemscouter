@@ -18,7 +18,10 @@ const CLIENT_ID     = process.env.EBAY_CLIENT_ID;
 const CLIENT_SECRET = process.env.EBAY_CLIENT_SECRET;
 const CAMPAIGN_ID   = process.env.EBAY_CAMPAIGN_ID || '5339145706';
 
-const COLLECTION_URL = 'https://www.ebay.com/inf/gemscouter/collections/101331828749';
+const COLLECTION_URLS = [
+  'https://www.ebay.com/inf/gemscouter/collections/101331828749',
+  'https://www.ebay.com/inf/gemscouter/collections/103815643151',
+];
 const SHEET_CSV_URL  = 'https://docs.google.com/spreadsheets/d/1R0PmBS_kJsgU8uvewGm8JHzLphEcUHwDQWraSAOwiFY/export?format=csv&gid=938314832';
 
 const FALLBACK_PINNED_IDS = [
@@ -105,31 +108,37 @@ function parseCSVRow(row) {
   return cols;
 }
 
-// ── 2. Fetch eBay collection ──────────────────────────────
+// ── 2. Fetch eBay collections ──────────────────────────────
 async function fetchCollectionIds() {
-  log('Fetching eBay collection...');
-  try {
-    const res = await fetch(COLLECTION_URL, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-      },
-    });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const html = await res.text();
-    const ids = [];
-    const pattern = /\/itm\/(\d{12,13})/g;
-    var match;
-    while ((match = pattern.exec(html)) !== null) {
-      if (!ids.includes(match[1])) ids.push(match[1]);
+  log('Fetching eBay collections...');
+  var allIds = [];
+  for (var c = 0; c < COLLECTION_URLS.length; c++) {
+    try {
+      const res = await fetch(COLLECTION_URLS[c], {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        },
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const html = await res.text();
+      const pattern = /\/itm\/(\d{12,13})/g;
+      var match;
+      var count = 0;
+      while ((match = pattern.exec(html)) !== null) {
+        if (!allIds.includes(match[1])) { allIds.push(match[1]); count++; }
+      }
+      log('  Collection ' + (c + 1) + ': ' + count + ' items');
+    } catch (err) {
+      log('  Collection ' + (c + 1) + ' failed: ' + err.message);
     }
-    if (!ids.length) throw new Error('No IDs found');
-    log('  Found ' + ids.length + ' items in collection');
-    return ids;
-  } catch (err) {
-    log('  Collection fetch failed: ' + err.message + ' — using fallback');
+  }
+  if (!allIds.length) {
+    log('  All collections failed — using fallback');
     return FALLBACK_PINNED_IDS;
   }
+  log('  Total from all collections: ' + allIds.length);
+  return allIds;
 }
 
 function detectCategory(title) {
