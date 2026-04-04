@@ -84,6 +84,24 @@ footer{background:var(--deep);color:var(--cream);padding:2rem;display:flex;justi
 @media(max-width:1200px){.listing-grid{grid-template-columns:repeat(4,1fr);}}
 @media(max-width:900px){.listing-grid{grid-template-columns:repeat(3,1fr);}}
 @media(max-width:600px){.listing-grid{grid-template-columns:repeat(2,1fr);}.filters{flex-direction:column;}.saved-panel{width:100%;}}
+.item-modal{display:none;position:fixed;inset:0;background:rgba(28,23,16,0.7);z-index:1000;align-items:center;justify-content:center;padding:1rem;}
+.item-modal.open{display:flex;}
+.item-modal-box{background:var(--light);max-width:720px;width:100%;max-height:90vh;overflow-y:auto;position:relative;border-radius:2px;}
+.item-modal-close{position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--stone);z-index:10;}
+.item-modal-inner{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+.item-modal-inner img{width:100%;aspect-ratio:1;object-fit:cover;display:block;}
+.item-modal-info{padding:2rem;display:flex;flex-direction:column;gap:0.8rem;}
+.item-modal-badge{font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;background:var(--deep);color:var(--cream);padding:0.2rem 0.7rem;border-radius:2px;display:inline-block;align-self:flex-start;}
+.item-modal-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:400;line-height:1.3;color:var(--deep);}
+.item-modal-meta{font-size:0.75rem;color:var(--stone);}
+.item-modal-price{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:600;color:var(--deep);}
+.item-modal-tags{display:flex;flex-wrap:wrap;gap:0.3rem;}
+.item-modal-btn{display:block;text-align:center;padding:0.9rem;background:var(--rust);color:white;text-decoration:none;font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;border-radius:2px;margin-top:auto;}
+.item-modal-btn:hover{background:var(--umber);}
+.item-modal-actions{display:flex;gap:0.5rem;}
+.item-modal-action-btn{flex:1;text-align:center;padding:0.6rem;background:none;border:1px solid var(--border);color:var(--stone);font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;border-radius:2px;text-decoration:none;font-family:'Jost',sans-serif;}
+.item-modal-action-btn:hover{border-color:var(--rust);color:var(--rust);}
+@media(max-width:600px){.item-modal-inner{grid-template-columns:1fr;}.item-modal-inner img{aspect-ratio:4/3;}}
 </style>
 </head>
 <body>
@@ -189,6 +207,27 @@ footer{background:var(--deep);color:var(--cream);padding:2rem;display:flex;justi
   </div>
 </div>
 <div id="savedOverlay" class="overlay" onclick="closeSaved()"></div>
+
+<div id="itemModal" class="item-modal" onclick="if(event.target===this)closeItemModal()">
+  <div class="item-modal-box">
+    <button class="item-modal-close" onclick="closeItemModal()">&#x2715;</button>
+    <div class="item-modal-inner">
+      <div id="itemModalImg"></div>
+      <div class="item-modal-info">
+        <div id="itemModalBadge" class="item-modal-badge"></div>
+        <div id="itemModalTitle" class="item-modal-title"></div>
+        <div id="itemModalMeta" class="item-modal-meta"></div>
+        <div id="itemModalPrice" class="item-modal-price"></div>
+        <div id="itemModalTags" class="item-modal-tags"></div>
+        <a id="itemModalBtn" href="#" target="_blank" rel="noopener" class="item-modal-btn">View &amp; Buy</a>
+        <div class="item-modal-actions">
+          <button onclick="copyItemLink()" class="item-modal-action-btn">&#x1F517; Copy Link</button>
+          <a id="itemModalPin" href="#" target="_blank" rel="noopener" class="item-modal-action-btn">&#x1F4CC; Pin It</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <footer>
   <div class="footer-logo">Gem <span>Scouter</span></div>
@@ -322,7 +361,7 @@ function buildCard(item) {
     : '<div class="card-img-placeholder">&#x231A;</div>';
 
   return [
-    '<div class="card" onclick="window.open(\'' + url + '\',\'_blank\')">',
+    '<div class="card" onclick="openItemModal(\'' + item.id + '\')">', 
       '<div style="position:relative">',
         imgHtml,
         '<span class="' + badgeClass + '">' + badge + '</span>',
@@ -451,6 +490,79 @@ async function loadListings() {
 
 updateSavedCount();
 loadListings();
+
+// ── ITEM MODAL ────────────────────────────────────────────
+var currentModalItem = null;
+
+function openItemModal(itemId) {
+  var item = allListings.find(function(i) { return i.id === itemId; });
+  if (!item) return;
+  currentModalItem = item;
+
+  var imgUrl = item.imageUrl ? item.imageUrl.replace('http://', 'https://') : '';
+  var imgEl = document.getElementById('itemModalImg');
+  imgEl.innerHTML = imgUrl
+    ? '<img src="' + imgUrl + '" alt="" style="width:100%;aspect-ratio:1;object-fit:cover;display:block;" onerror="this.style.display=\'none\'">'
+    : '<div style="width:100%;aspect-ratio:1;background:var(--cream);display:flex;align-items:center;justify-content:center;font-size:3rem;">&#x231A;</div>';
+
+  var badge = item.pinned ? (item.source && item.source !== 'eBay' ? item.source.split('/')[0].trim() : 'Hand-picked') : 'Scouted';
+  document.getElementById('itemModalBadge').textContent = badge;
+  document.getElementById('itemModalTitle').textContent = item.title;
+
+  var cond = item.condition && item.condition.toLowerCase().indexOf('new') === -1 ? item.condition : '';
+  var meta = [];
+  if (cond) meta.push(cond);
+  if (item.category) meta.push(item.category);
+  document.getElementById('itemModalMeta').textContent = meta.join(' · ');
+
+  document.getElementById('itemModalPrice').textContent = '$' + parseFloat(item.price || 0).toFixed(2);
+
+  var tags = (item.tags || []).slice(0, 4).map(function(t) {
+    return '<span class="mtag">' + t + '</span>';
+  }).join('');
+  document.getElementById('itemModalTags').innerHTML = tags;
+
+  document.getElementById('itemModalBtn').href = item.affiliateUrl || '#';
+
+  var pageUrl = window.location.origin + window.location.pathname + '?item=' + item.id;
+  document.getElementById('itemModalPin').href = 'https://pinterest.com/pin/create/button/?url=' + encodeURIComponent(pageUrl) + '&media=' + encodeURIComponent(imgUrl) + '&description=' + encodeURIComponent(item.title);
+
+  document.getElementById('itemModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  if (history.pushState) history.pushState(null, '', '?item=' + item.id);
+}
+
+function closeItemModal() {
+  document.getElementById('itemModal').classList.remove('open');
+  document.body.style.overflow = '';
+  currentModalItem = null;
+  if (history.pushState) history.pushState(null, '', window.location.pathname);
+}
+
+function copyItemLink() {
+  if (!currentModalItem) return;
+  var url = window.location.origin + window.location.pathname + '?item=' + currentModalItem.id;
+  navigator.clipboard.writeText(url).then(function() {
+    var btn = document.querySelector('.item-modal-action-btn');
+    var orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(function() { btn.textContent = orig; }, 1500);
+  });
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeItemModal();
+});
+
+// Check for ?item= param on load
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var itemId = params.get('item');
+  if (itemId) {
+    setTimeout(function() { openItemModal(itemId); }, 800);
+  }
+})();
 
 </script>
 </body>
