@@ -414,25 +414,68 @@ function dedupeItems(items) {
   });
 }
 
+function seededRand(seed) {
+  var s = seed;
+  return function() {
+    s = (s * 1664525 + 1013904223) & 0xffffffff;
+    return (s >>> 0) / 0xffffffff;
+  };
+}
+
 function shuffleMix(items) {
-  var byCategory = {};
-  items.forEach(function(item) {
-    var cat = item.category || 'other';
-    if (!byCategory[cat]) byCategory[cat] = [];
-    byCategory[cat].push(item);
-  });
-  var cats = Object.values(byCategory);
-  var mixed = [];
-  var maxLen = Math.max.apply(null, cats.map(function(c) { return c.length; }));
-  for (var i = 0; i < maxLen; i++) {
-    cats.forEach(function(cat) { if (cat[i]) mixed.push(cat[i]); });
+  var rand = seededRand(Math.floor(Date.now() / 3600000));
+
+  var sheetPinned  = items.filter(function(i) { return i.pinned && i.source !== 'eBay'; });
+  var ebayPinned   = items.filter(function(i) { return i.pinned && i.source === 'eBay'; });
+  var trusted      = items.filter(function(i) { return !i.pinned && i.trusted; });
+  var broad        = items.filter(function(i) { return !i.pinned && !i.trusted; });
+
+  function priceBand(p) {
+    if (p < 50)  return 0;
+    if (p < 150) return 1;
+    if (p < 300) return 2;
+    return 3;
   }
-  return mixed;
+
+  function interleaveByCategory(arr) {
+    var byCategory = {};
+    arr.forEach(function(item) {
+      var cat = item.category || 'other';
+      if (!byCategory[cat]) byCategory[cat] = [];
+      byCategory[cat].push(item);
+    });
+    var cats = Object.values(byCategory);
+    if (!cats.length) return [];
+    var mixed = [];
+    var maxLen = Math.max.apply(null, cats.map(function(c) { return c.length; }));
+    for (var i = 0; i < maxLen; i++) {
+      cats.forEach(function(cat) { if (cat[i]) mixed.push(cat[i]); });
+    }
+    return mixed;
+  }
+
+  // Sort eBay pinned by price band, randomise within band
+  ebayPinned.sort(function(a, b) {
+    var bandDiff = priceBand(a.price) - priceBand(b.price);
+    return bandDiff !== 0 ? bandDiff : rand() - 0.5;
+  });
+
+  // Shuffle trusted and broad within category interleave
+  trusted.sort(function() { return rand() - 0.5; });
+  broad.sort(function() { return rand() - 0.5; });
+
+  // Order: sheet hand-picks → eBay hand-picks → trusted sellers → broad scouted
+  return interleaveByCategory(sheetPinned)
+    .concat(interleaveByCategory(ebayPinned))
+    .concat(interleaveByCategory(trusted))
+    .concat(interleaveByCategory(broad));
 }
 
 function renderGrid() {
   var grid = document.getElementById('listingGrid');
-  var items = shuffleMix(dedupeItems(getFiltered()));
+  var sort = document.getElementById('filterSort').value;
+  var filtered = dedupeItems(getFiltered());
+  var items = (sort === 'default') ? shuffleMix(filtered) : filtered;
   grid.innerHTML = items.length
     ? items.map(buildCard).join('')
     : '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--stone);font-family:\'Cormorant Garamond\',serif;font-style:italic;font-size:1.2rem">No gems found — try broadening your search</div>';
