@@ -24,17 +24,18 @@ DELAY_BETWEEN_PINS = 30  # seconds between API calls (be gentle with the API)
 
 # Data sources — Gem Scouter pulls from these JSON files via GitHub Pages
 DATA_URLS = [
-    "https://gemscouter.com/data/trusted_sellers.json",
-    "https://gemscouter.com/data/scouted.json",
-    "https://gemscouter.com/data/listings.json",
-    "https://gemscouter.com/data/trusted_scouted.json",
-    "https://gemscouter.com/data/broad_scouted.json",
+    "https://gemscouter.com/listings.json",
 ]
 
 PINTEREST_PINS_URL = "https://api.pinterest.com/v5/pins"
 
 # Category → Pinterest board section hints (optional, for future board sections)
 CATEGORY_HASHTAGS = {
+    "Watches & Timepieces": ["#vintagewatches", "#watchcollector", "#antiquewatch", "#vintagestyle"],
+    "Jewelry & Accessories": ["#vintagejewelry", "#handmadejewelry", "#estatejewelry", "#bohojewelry"],
+    "Eyewear & Sunglasses": ["#vintageeyewear", "#sunglassesstyle", "#retrosunglasses", "#vintagefashion"],
+    "Paintings & Original Art": ["#originalart", "#handmadeart", "#artcollector", "#vintageart"],
+    # Also handle shorter category names
     "Watches":   ["#vintagewatches", "#watchcollector", "#antiquewatch", "#vintagestyle"],
     "Jewelry":   ["#vintagejewelry", "#handmadejewelry", "#estatejewelry", "#bohojewelry"],
     "Eyewear":   ["#vintageeyewear", "#sunglassesstyle", "#retrosunglasses", "#vintagefashion"],
@@ -46,24 +47,21 @@ DEFAULT_HASHTAGS = ["#vintagefinds", "#handmade", "#shopvintage", "#uniquegifts"
 # ─── HELPERS ─────────────────────────────────────────────────────────────────
 
 def fetch_listings():
-    """Try each data URL until we get listings."""
+    """Fetch listings from Gem Scouter's listings.json."""
     listings = []
     for url in DATA_URLS:
         try:
             r = requests.get(url, timeout=10)
             if r.status_code == 200:
                 data = r.json()
-                # Handle different data shapes
+                items = []
                 if isinstance(data, list):
                     items = data
                 elif isinstance(data, dict):
-                    # Could be {trustedScouted: [...], broadScouted: [...]} etc.
-                    for key in ["trustedScouted", "broadScouted", "listings", "items", "results"]:
+                    # listings.json has {pinned: [...], scouted: [...]}
+                    for key in ["pinned", "scouted", "trustedScouted", "broadScouted", "listings", "items", "results"]:
                         if key in data and isinstance(data[key], list):
-                            items = data[key]
-                            break
-                    else:
-                        items = []
+                            items.extend(data[key])
                 listings.extend(items)
                 print(f"  ✓ {url} → {len(items)} items")
         except Exception as e:
@@ -120,9 +118,27 @@ def get_image_url(item: dict) -> str | None:
     """Extract the best image URL from an item."""
     for key in ["imageUrl", "image", "galleryURL", "picture", "thumbnail", "img"]:
         url = item.get(key)
-        if url and url.startswith("http"):
+        if url and isinstance(url, str) and url.startswith("http"):
             return url
     return None
+
+
+def get_item_id(item: dict) -> str | None:
+    """Get the unique item ID."""
+    return item.get("id") or item.get("itemId")
+
+
+def get_affiliate_url(item: dict) -> str:
+    """Get the affiliate/buy URL for the item."""
+    # Your data already has affiliateUrl with campid baked in
+    url = item.get("affiliateUrl") or item.get("viewItemURL") or item.get("url") or item.get("link", "")
+    if not url:
+        return "https://gemscouter.com"
+    # Only append campid for eBay URLs that don't already have it
+    if "ebay.com" in url and "campid" not in url:
+        sep = "&" if "?" in url else "?"
+        url = f"{url}{sep}campid={AFFILIATE_CAMPID}&toolid=10001"
+    return url
 
 
 def already_pinned_today(item_id: str, pinned_log: dict) -> bool:
@@ -153,9 +169,7 @@ def pin_item(item: dict) -> bool:
         print(f"    ⚠ No image for: {item.get('title', '?')[:50]}")
         return False
 
-    item_url = item.get("viewItemURL", item.get("url", item.get("link", "")))
-    affiliate_url = build_affiliate_url(item_url) if item_url else "https://gemscouter.com"
-
+    affiliate_url = get_affiliate_url(item)
     title = item.get("title", "Rare Vintage Find")[:100]  # Pinterest title limit
 
     payload = {
@@ -213,7 +227,7 @@ def main():
     already_today = set(pinned_log.get(today, []))
     candidates = [
         item for item in all_listings
-        if item.get("itemId") and item["itemId"] not in already_today and get_image_url(item)
+        if get_item_id(item) and get_item_id(item) not in already_today and get_image_url(item)
     ]
 
     print(f"   Eligible to pin today: {len(candidates)}")
@@ -231,7 +245,7 @@ def main():
     success_count = 0
 
     for i, item in enumerate(to_pin, 1):
-        item_id = item.get("itemId", f"unknown_{i}")
+        item_id = get_item_id(item) or f"unknown_{i}"
         print(f"  [{i}/{len(to_pin)}] {item.get('title', '?')[:60]}")
 
         if pin_item(item):
