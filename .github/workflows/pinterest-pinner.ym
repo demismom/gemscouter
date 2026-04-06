@@ -1,0 +1,64 @@
+name: 📌 Pinterest Daily Pinner
+
+on:
+  schedule:
+    # Run every day at 10:00 AM UTC (6am ET / 9am PT) — peak Pinterest browse time
+    - cron: "0 10 * * *"
+  workflow_dispatch:
+    # Allow manual trigger from GitHub Actions UI (great for testing)
+    inputs:
+      dry_run:
+        description: "Dry run (fetch listings but don't actually pin)"
+        required: false
+        default: "false"
+        type: boolean
+
+jobs:
+  pin-to-pinterest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install requests
+
+      - name: Restore pinned log cache
+        uses: actions/cache@v4
+        with:
+          path: pinned_log.json
+          key: pinterest-pinned-log-${{ github.run_id }}
+          restore-keys: |
+            pinterest-pinned-log-
+
+      - name: Run Pinterest pinner
+        env:
+          PINTEREST_ACCESS_TOKEN: ${{ secrets.PINTEREST_ACCESS_TOKEN }}
+          PINTEREST_BOARD_ID: ${{ secrets.PINTEREST_BOARD_ID }}
+          DRY_RUN: ${{ inputs.dry_run || 'false' }}
+        run: |
+          cd pinterest-pinner
+          python pin_gems.py
+
+      - name: Save pinned log
+        uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: pinned_log.json
+          key: pinterest-pinned-log-${{ github.run_id }}
+
+      - name: Upload pinned log artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pinned-log-${{ github.run_id }}
+          path: pinned_log.json
+          retention-days: 30
