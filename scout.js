@@ -145,7 +145,9 @@ function detectCategory(title) {
   const t = (title || '').toLowerCase();
   if (t.includes('watch') || t.includes('wrist'))         return 'Watches & Timepieces';
   if (t.includes('glasses') || t.includes('frames') || t.includes('sunglasses') || t.includes('eyewear') || t.includes('spectacles') || t.includes('optical')) return 'Eyewear & Sunglasses';
-  if (t.includes('painting') || t.includes('oil on') || t.includes('canvas') || t.includes('watercolor')) return 'Paintings & Original Art';
+  var artTerms = ['painting','oil on','canvas','watercolor','watercolour','drawing','sketch','pastel','gouache','acrylic','serigraph','silkscreen','photograph','original art','mixed media','charcoal'];
+  var printTerms = ['print','giclee','reproduction','poster','lithograph','offset'];
+  if (artTerms.some(function(w){return t.includes(w);}) && !printTerms.some(function(w){return t.includes(w);})) return 'Art & Originals';
   if (t.includes('brooch') || t.includes('necklace') || t.includes('bracelet') || t.includes('ring') || t.includes('earring')) return 'Jewelry & Accessories';
   return 'Jewelry & Accessories';
 }
@@ -202,20 +204,35 @@ async function main() {
   log('Token obtained ✓');
 
   const pinnedIds = await fetchCollectionIds();
-  log('Fetching ' + pinnedIds.length + ' pinned items from API...');
+  log('Fetching ' + pinnedIds.length + ' pinned items from API (batches of 10)...');
 
-  const pinnedResults = await Promise.allSettled(
-    pinnedIds.map(function(id) { return getItem(id, token, CAMPAIGN_ID); })
-  );
+  // Fetch in batches of 10 to avoid overwhelming the connection pool
+  const BATCH_SIZE = 10;
+  const ebayPinned = [];
+  for (var b = 0; b < pinnedIds.length; b += BATCH_SIZE) {
+    const batch = pinnedIds.slice(b, b + BATCH_SIZE);
+    const batchNum = Math.floor(b / BATCH_SIZE) + 1;
+    const totalBatches = Math.ceil(pinnedIds.length / BATCH_SIZE);
+    log('  Batch ' + batchNum + '/' + totalBatches + ' (' + batch.length + ' items)...');
 
-  const ebayPinned = pinnedResults.map(function(r, i) {
-    if (r.status === 'fulfilled' && r.value && r.value.image && r.value.image.imageUrl) {
-      log('  ✓ ' + (r.value.title || '').substring(0, 55));
-      return normalise(r.value, true);
+    const results = await Promise.allSettled(
+      batch.map(function(id) { return getItem(id, token, CAMPAIGN_ID); })
+    );
+
+    results.forEach(function(r, i) {
+      if (r.status === 'fulfilled' && r.value && r.value.image && r.value.image.imageUrl) {
+        ebayPinned.push(normalise(r.value, true));
+      } else {
+        var reason = r.reason && r.reason.message ? r.reason.message : 'no image';
+        log('    ✗ Item ' + batch[i] + ': ' + reason);
+      }
+    });
+
+    // Small pause between batches to be kind to the API
+    if (b + BATCH_SIZE < pinnedIds.length) {
+      await new Promise(function(r) { setTimeout(r, 500); });
     }
-    log('  ✗ Item ' + pinnedIds[i] + ': ' + (r.reason && r.reason.message ? r.reason.message : 'no image'));
-    return null;
-  }).filter(Boolean);
+  }
 
   log('eBay pinned: ' + ebayPinned.length + '/' + pinnedIds.length + ' fetched ✓');
 
