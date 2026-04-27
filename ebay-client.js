@@ -8,6 +8,51 @@ const EBAY_AUTH_URL = 'https://api.ebay.com/identity/v1/oauth2/token';
 let cachedToken = null;
 let tokenExpiry = null;
 
+// ── RETRY HELPER ─────────────────────────────────────────
+// Retries a fetch call up to maxRetries times with exponential backoff.
+// Treats network errors (timeout, connection refused) and 5xx responses as retryable.
+async function fetchWithRetry(url, options = {}, maxRetries = 3, timeoutMs = 15000) {
+  let lastError;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+      const response = await fetch(url, { ...options, signal: controller.signal });
+      clearTimeout(timer);
+
+      // Retry on 5xx server errors (eBay occasionally returns 503 under load)
+      if (response.status >= 500 && attempt < maxRetries) {
+        const wait = attempt * 2000;
+        console.log(`  eBay returned ${response.status} — retrying in ${wait / 1000}s (attempt ${attempt}/${maxRetries})`);
+        await new Promise(r => setTimeout(r, wait));
+        continue;
+      }
+
+      return response;
+    } catch (err) {
+      clearTimeout(timer);
+      lastError = err;
+
+      const isTimeout = err.name === 'AbortError' || err.code === 'UND_ERR_CONNECT_TIMEOUT';
+      const isNetwork = isTimeout || err.message.includes('fetch failed') || err.message.includes('ECONNREFUSED');
+
+      if (isNetwork && attempt < maxRetries) {
+        const wait = attempt * 3000;
+        console.log(`  Network error (${err.message.slice(0, 60)}) — retrying in ${wait / 1000}s (attempt ${attempt}/${maxRetries})`);
+        await new Promise(r => setTimeout(r, wait));
+        continue;
+      }
+
+      throw err;
+    }
+  }
+
+  throw lastError;
+}
+
+// ── GET TOKEN ─────────────────────────────────────────────
 async function getToken(clientId, clientSecret) {
   if (cachedToken && tokenExpiry && Date.now() < tokenExpiry - 300000) {
     return cachedToken;
@@ -15,14 +60,19 @@ async function getToken(clientId, clientSecret) {
 
   const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
 
-  const response = await fetch(EBAY_AUTH_URL, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Basic ${credentials}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
+  const response = await fetchWithRetry(
+    EBAY_AUTH_URL,
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${credentials}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: 'grant_type=client_credentials&scope=https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope',
     },
-    body: 'grant_type=client_credentials&scope=https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope',
-  });
+    3,    // maxRetries
+    15000 // 15 second timeout per attempt
+  );
 
   if (!response.ok) {
     const text = await response.text();
@@ -35,15 +85,22 @@ async function getToken(clientId, clientSecret) {
   return cachedToken;
 }
 
+// ── GET ITEM ──────────────────────────────────────────────
 async function getItem(itemId, token, campaignId) {
   const url = `${EBAY_API_BASE}/buy/browse/v1/item/v1|${itemId}|0`;
-  const response = await fetch(url, {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US',
-      'X-EBAY-C-ENDUSERCTX': campaignId ? `affiliateCampaignId=${campaignId}` : '',
+
+  const response = await fetchWithRetry(
+    url,
+    {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US',
+        'X-EBAY-C-ENDUSERCTX': campaignId ? `affiliateCampaignId=${campaignId}` : '',
+      },
     },
-  });
+    2,    // maxRetries
+    12000 // 12 second timeout
+  );
 
   if (!response.ok) {
     throw new Error(`Item ${itemId}: ${response.status}`);
@@ -51,6 +108,7 @@ async function getItem(itemId, token, campaignId) {
   return response.json();
 }
 
+// ── SEARCH ITEMS ──────────────────────────────────────────
 async function searchItems({ token, query, categoryId, priceMin, priceMax, conditions = ['USED'], sellers = [], limit = 20, campaignId, trusted = false }) {
 
   // Safety guard — never run a trusted query without sellers, it would return all of eBay
@@ -61,7 +119,6 @@ async function searchItems({ token, query, categoryId, priceMin, priceMax, condi
 
   const url = new URL(`${EBAY_API_BASE}/buy/browse/v1/item_summary/search`);
 
-  // eBay condition filter values
   const CONDITION_MAP = {
     'NEW':          '1000',
     'USED':         '3000',
@@ -93,13 +150,18 @@ async function searchItems({ token, query, categoryId, priceMin, priceMax, condi
   url.searchParams.set('limit', String(limit));
   if (categoryId) url.searchParams.set('category_ids', categoryId);
 
-  const response = await fetch(url.toString(), {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US',
-      'X-EBAY-C-ENDUSERCTX': campaignId ? `affiliateCampaignId=${campaignId}` : '',
+  const response = await fetchWithRetry(
+    url.toString(),
+    {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US',
+        'X-EBAY-C-ENDUSERCTX': campaignId ? `affiliateCampaignId=${campaignId}` : '',
+      },
     },
-  });
+    2,    // maxRetries
+    12000 // 12 second timeout
+  );
 
   if (!response.ok) {
     throw new Error(`Search failed: ${response.status} — ${await response.text()}`);
