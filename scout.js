@@ -22,6 +22,11 @@ const COLLECTION_URLS = [
   'https://www.ebay.com/inf/gemscouter/collections/101331828749',
   'https://www.ebay.com/inf/gemscouter/collections/103815643151',
 ];
+
+// Home decor collection — all items forced to Home Decor category
+const HOME_COLLECTION_URLS = [
+  'https://www.ebay.com/inf/gemscouter/collections/137907470350',
+];
 const SHEET_CSV_URL  = 'https://docs.google.com/spreadsheets/d/1R0PmBS_kJsgU8uvewGm8JHzLphEcUHwDQWraSAOwiFY/export?format=csv&gid=938314832';
 
 const FALLBACK_PINNED_IDS = [
@@ -141,6 +146,35 @@ async function fetchCollectionIds() {
   return allIds;
 }
 
+// ── Fetch home collection IDs ─────────────────────────────
+async function fetchHomeCollectionIds() {
+  log('Fetching home collection...');
+  var allIds = [];
+  for (var c = 0; c < HOME_COLLECTION_URLS.length; c++) {
+    try {
+      const res = await fetch(HOME_COLLECTION_URLS[c], {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        },
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const html = await res.text();
+      const pattern = /\/itm\/(\d{12,13})/g;
+      var match;
+      var count = 0;
+      while ((match = pattern.exec(html)) !== null) {
+        if (!allIds.includes(match[1])) { allIds.push(match[1]); count++; }
+      }
+      log('  Home collection ' + (c + 1) + ': ' + count + ' items');
+    } catch (err) {
+      log('  Home collection ' + (c + 1) + ' failed: ' + err.message);
+    }
+  }
+  log('  Total home items: ' + allIds.length);
+  return allIds;
+}
+
 function detectCategory(title) {
   const t = (title || '').toLowerCase();
   if (t.includes('watch') || t.includes('wrist'))         return 'Watches & Timepieces';
@@ -148,6 +182,12 @@ function detectCategory(title) {
   var artTerms = ['painting','oil on','canvas','watercolor','watercolour','drawing','sketch','pastel','gouache','acrylic','serigraph','silkscreen','photograph','original art','mixed media','charcoal'];
   var printTerms = ['print','giclee','reproduction','poster','lithograph','offset'];
   if (artTerms.some(function(w){return t.includes(w);}) && !printTerms.some(function(w){return t.includes(w);})) return 'Art & Originals';
+  var ceramicTerms = ['vase','bowl','pitcher','platter','figurine','ceramic','pottery','porcelain','stoneware','earthenware','urn','jug','crock'];
+  if (ceramicTerms.some(function(w){return t.includes(w);})) return 'Ceramics & Pottery';
+  var barwareTerms = ['decanter','barware','cocktail shaker','silver tray','candlestick','candelabra','serving tray','ice bucket','coaster','tankard','goblet'];
+  if (barwareTerms.some(function(w){return t.includes(w);})) return 'Barware & Silver';
+  var homeTerms = ['mirror','lamp','lantern','wall decor','tapestry','cushion','pillow','throw','rug','clock','bookend','sculpture','figurine','candle holder','picture frame','table cloth'];
+  if (homeTerms.some(function(w){return t.includes(w);})) return 'Home Decor';
   if (t.includes('brooch') || t.includes('necklace') || t.includes('bracelet') || t.includes('ring') || t.includes('earring')) return 'Jewelry & Accessories';
   return 'Jewelry & Accessories';
 }
@@ -167,6 +207,30 @@ function inferTags(title) {
   if (t.includes('hermes'))     tags.push('hermes');
   if (t.includes('burberry'))   tags.push('burberry');
   return [...new Set(tags)];
+}
+
+function normaliseHome(item) {
+  const price = parseFloat(item.price && item.price.value ? item.price.value : 0);
+  // Detect specific home sub-category, default to Home Decor
+  var cat = detectCategory(item.title);
+  var homeCategories = ['Art & Originals', 'Ceramics & Pottery', 'Barware & Silver', 'Home Decor'];
+  if (homeCategories.indexOf(cat) === -1) cat = 'Home Decor';
+  return {
+    id: item.itemId,
+    title: item.title,
+    price: price,
+    priceFormatted: '$' + price.toFixed(2),
+    imageUrl: item.image && item.image.imageUrl ? item.image.imageUrl : null,
+    affiliateUrl: item.itemAffiliateWebUrl || item.itemWebUrl,
+    condition: item.condition || 'Pre-owned',
+    source: 'eBay',
+    category: cat,
+    tags: inferTags(item.title).concat(['home', 'vintage decor']),
+    pinned: true,
+    matchLabel: 'Hand-picked',
+    location: [item.itemLocation && item.itemLocation.city, item.itemLocation && item.itemLocation.stateOrProvince].filter(Boolean).join(', '),
+    scoutedAt: new Date().toISOString(),
+  };
 }
 
 function normalise(item, pinned) {
@@ -236,9 +300,39 @@ async function main() {
 
   log('eBay pinned: ' + ebayPinned.length + '/' + pinnedIds.length + ' fetched ✓');
 
-  // Merge all pinned — sheet first, then eBay collection
-  const allPinned = sheetListings.concat(ebayPinned);
-  log('Total pinned: ' + allPinned.length + ' (' + sheetListings.length + ' sheet + ' + ebayPinned.length + ' eBay)');
+  // ── Source 2b: Home collection ───────────────────────
+  const homeIds = await fetchHomeCollectionIds();
+  log('Fetching ' + homeIds.length + ' home items from API (batches of 10)...');
+
+  const homePinned = [];
+  for (var h = 0; h < homeIds.length; h += BATCH_SIZE) {
+    const batch = homeIds.slice(h, h + BATCH_SIZE);
+    const batchNum = Math.floor(h / BATCH_SIZE) + 1;
+    const totalBatches = Math.ceil(homeIds.length / BATCH_SIZE);
+    log('  Home batch ' + batchNum + '/' + totalBatches + ' (' + batch.length + ' items)...');
+
+    const results = await Promise.allSettled(
+      batch.map(function(id) { return getItem(id, token, CAMPAIGN_ID); })
+    );
+
+    results.forEach(function(r, i) {
+      if (r.status === 'fulfilled' && r.value && r.value.image && r.value.image.imageUrl) {
+        homePinned.push(normaliseHome(r.value));
+      } else {
+        var reason = r.reason && r.reason.message ? r.reason.message : 'no image';
+        log('    ✗ Home item ' + batch[i] + ': ' + reason);
+      }
+    });
+
+    if (h + BATCH_SIZE < homeIds.length) {
+      await new Promise(function(r) { setTimeout(r, 500); });
+    }
+  }
+  log('Home pinned: ' + homePinned.length + '/' + homeIds.length + ' fetched ✓');
+
+  // Merge all pinned — sheet first, then eBay accessories, then eBay home
+  const allPinned = sheetListings.concat(ebayPinned).concat(homePinned);
+  log('Total pinned: ' + allPinned.length + ' (' + sheetListings.length + ' sheet + ' + ebayPinned.length + ' eBay + ' + homePinned.length + ' home)');
 
   // ── Source 3: eBay scout ──────────────────────────────
   log('\nRunning category scouts...');
@@ -290,7 +384,7 @@ async function main() {
   fs.mkdirSync(path.dirname(OUT_FILE), { recursive: true });
   fs.writeFileSync(OUT_FILE, JSON.stringify(output, null, 2));
   log('\n✓ Done — ' + allPinned.length + ' pinned + ' + allScouted.length + ' scouted = ' + output.total + ' total gems');
-  log('  Sheet: ' + sheetListings.length + ' | eBay collection: ' + ebayPinned.length + ' | Trusted: ' + trustedScouted.length + ' | Broad: ' + broadScouted.length);
+  log('  Sheet: ' + sheetListings.length + ' | eBay accessories: ' + ebayPinned.length + ' | Home: ' + homePinned.length + ' | Trusted: ' + trustedScouted.length + ' | Broad: ' + broadScouted.length);
 }
 
 main().catch(function(err) {
