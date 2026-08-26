@@ -84,6 +84,9 @@ footer{background:var(--deep);color:var(--cream);padding:2rem;display:flex;justi
 @media(max-width:1200px){.listing-grid{grid-template-columns:repeat(4,1fr);}}
 @media(max-width:900px){.listing-grid{grid-template-columns:repeat(3,1fr);}}
 @media(max-width:600px){.listing-grid{grid-template-columns:repeat(2,1fr);}.filters{flex-direction:column;}.saved-panel{width:100%;}}
+.epn-disclosure{background:#f5f0e8;border-bottom:1px solid var(--border);padding:0.5rem 2rem;text-align:center;font-size:0.68rem;color:var(--stone);letter-spacing:0.04em;line-height:1.5;}
+.epn-disclosure a{color:var(--rust);text-decoration:none;}
+.epn-disclosure a:hover{text-decoration:underline;}
 .dept-btn{padding:0.4rem 0.8rem;font-family:'Jost',sans-serif;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;border-radius:2px 2px 0 0;border:1px solid var(--border);border-bottom:none;background:white;color:var(--stone);transition:all 0.2s;}
 .dept-btn.active,.dept-btn:hover{background:var(--deep);color:var(--cream);border-color:var(--deep);}
 </style>
@@ -113,6 +116,9 @@ footer{background:var(--deep);color:var(--cream);padding:2rem;display:flex;justi
     <span>No mass production</span><span>No digital prints</span><span>Only handmade</span><span>Only vintage</span><span>Price doesn't signal value</span><span>Art is subjective</span>
     <span>No mass production</span><span>No digital prints</span><span>Only handmade</span><span>Only vintage</span><span>Price doesn't signal value</span><span>Art is subjective</span>
   </div>
+</div>
+<div class="epn-disclosure">
+  <strong>Affiliate Disclosure:</strong> As an eBay Partner Network Affiliate, I earn from qualifying purchases. Gem Scouter also participates in the Amazon Associates Program. Links on this site may be affiliate links — purchases support this site at no extra cost to you. <a href="/privacy.html">Learn more</a>
 </div>
 
 <section class="hero">
@@ -220,7 +226,7 @@ footer{background:var(--deep);color:var(--cream);padding:2rem;display:flex;justi
     <a href="/privacy.html" style="font-size:0.68rem;color:rgba(242,236,224,0.5);text-decoration:none;letter-spacing:0.08em;">Privacy Policy</a>
   </div>
   <div style="width:100%;font-size:0.62rem;color:rgba(242,236,224,0.35);line-height:1.6;padding-top:0.8rem;letter-spacing:0.04em;">
-    As an eBay Partner Network Affiliate, I earn from qualifying purchases made through links on this site. Gem Scouter also participates in the Amazon Associates Program and may earn from qualifying Amazon purchases. Affiliate links are used throughout this site — purchases made through them support Gem Scouter at no extra cost to you.
+    As an eBay Partner Network Affiliate, I earn from qualifying purchases. Gem Scouter also participates in the Amazon Associates Program. Affiliate links are used throughout this site — purchases made through them support Gem Scouter at no extra cost to you.
   </div>
 </footer>
 
@@ -384,9 +390,7 @@ function setDept(dept) {
   var catEl = document.getElementById('filterCat');
   var currentCat = catEl.value;
   var validCats = dept === 'all' ? null : DEPT_CATEGORIES[dept];
-  if (validCats && currentCat && validCats.indexOf(currentCat) === -1) {
-    catEl.value = '';
-  }
+  if (validCats && currentCat && validCats.indexOf(currentCat) === -1) catEl.value = '';
   renderGrid();
 }
 
