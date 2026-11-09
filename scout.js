@@ -31,6 +31,12 @@ const HOME_COLLECTION_URLS = [
 
 const USE_COLLECTIONS = true;
 
+// Troubleshooting: paste eBay item numbers of listings you KNOW have sold (or ended).
+// The scout will print exactly what eBay returns for them in the log, then you can empty this list.
+const DEBUG_ITEM_IDS = [
+  // '123456789012',
+];
+
 // While you rebuild your collection, keep the items already on the site.
 // When the new collection has everything you want, set this to false —
 // from then on the collection is the single source of truth (remove from it = removed from site).
@@ -139,10 +145,29 @@ function loadPreviousEbayItems() {
   } catch (e) { return {}; }
 }
 
+async function debugItems(token) {
+  for (var i = 0; i < DEBUG_ITEM_IDS.length; i++) {
+    var id = DEBUG_ITEM_IDS[i];
+    try {
+      const it = await getItem(id, token, CAMPAIGN_ID);
+      log('DEBUG ' + id + ': ' + JSON.stringify({
+        title: String(it.title || '').slice(0, 60),
+        availability: it.estimatedAvailabilities,
+        itemEndDate: it.itemEndDate,
+        buyingOptions: it.buyingOptions,
+        fields: Object.keys(it).join(','),
+      }));
+    } catch (e) {
+      log('DEBUG ' + id + ' error: ' + e.message);
+    }
+  }
+}
+
 function isStillAvailable(item) {
   if (!item) return false;
   var avail = item.estimatedAvailabilities && item.estimatedAvailabilities[0];
   if (avail && avail.estimatedAvailabilityStatus === 'OUT_OF_STOCK') return false;
+  if (avail && avail.estimatedRemainingQuantity === 0) return false;
   if (item.itemEndDate && new Date(item.itemEndDate).getTime() < Date.now()) return false;
   return true;
 }
@@ -232,10 +257,56 @@ async function fetchHomeCollectionIds() {
   return allIds;
 }
 
+// ── On-topic filter for SCOUTED items (hand-picked items are never filtered) ──
+// Drops clothing, toys, media etc. and requires a recognisable jewelry / watch / eyewear / art / home word.
+const OFFTOPIC_RE = new RegExp('\\b(?:t-?shirts?|tees?|shirts?|tank tops?|tops?|blouses?|sweaters?|sweatshirts?|hoodies?|jackets?|coats?|jeans|pants|trousers|shorts|leggings|skirts?|pajamas|dress(?:es)?(?!\\s*(?:watch|ring|clip|pin|bracelet|earring|necklace|shoes?))|dolls?|barbie|toys?|plush|teddy|action figures?|funko|lego|puzzles?|board games?|video games?|dvds?|vhs|cassettes?|vinyl|magazines?|trading cards?|stickers?|diapers?|underwear|swimsuits?|costumes?)\\b', 'i');
+
+const ONTOPIC_WORDS = [
+  // jewelry
+  'ring','rings','necklace','bracelet','bangle','brooch','pin','earring','earrings','pendant','charm','charms','locket','cufflinks','cufflink','jewelry','jewellery','choker','anklet','clip','tiara','chain','cameo','parure','tie clip','tie tack',
+  // watches
+  'watch','watches','wristwatch','timepiece','chronograph',
+  // eyewear
+  'sunglasses','glasses','eyeglasses','eyewear','spectacles','frames','shades','optical','lens','lenses',
+  // art
+  'painting','oil on','canvas','watercolor','watercolour','drawing','sketch','pastel','gouache','acrylic','serigraph','silkscreen','photograph','original art','mixed media','charcoal','etching','lithograph','print',
+  // home
+  'vase','bowl','pitcher','platter','figurine','ceramic','pottery','porcelain','stoneware','decanter','barware','candlestick','candelabra','tray','mirror','lamp','lantern','clock','bookend','sculpture','frame','tapestry','candle holder','goblet','tankard','ice bucket','silver'
+];
+const ONTOPIC_RE = new RegExp('\\b(?:' + ONTOPIC_WORDS.map(function(w) { return w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|') + ')\\b', 'i');
+
+function isOnTopic(title) {
+  var t = String(title || '');
+  if (OFFTOPIC_RE.test(t)) return false;
+  return ONTOPIC_RE.test(t);
+}
+
+// ── Trusted seller scope: what each trusted seller is allowed to contribute ──
+const SELLER_SCOPE = {
+  'timekeepersco':         ['Watches & Timepieces'],
+  'keepwatchin':           ['Watches & Timepieces'],
+  'sunglassmuseum':        ['Eyewear & Sunglasses'],
+  'jewelry4you':           ['Jewelry & Accessories'],
+  'electriccityvintage':   ['Jewelry & Accessories'],
+  'homedecordistributors': ['Art & Originals', 'Home Decor', 'Ceramics & Pottery', 'Barware & Silver'],
+};
+
+// Union of the scopes of a query's sellers; null (no restriction) if any seller is unlisted
+function scopeForQuery(query) {
+  if (!query.trusted || !query.sellers || !query.sellers.length) return null;
+  var allowed = [];
+  for (var i = 0; i < query.sellers.length; i++) {
+    var sc = SELLER_SCOPE[String(query.sellers[i]).toLowerCase()];
+    if (!sc) return null;
+    sc.forEach(function(c) { if (allowed.indexOf(c) === -1) allowed.push(c); });
+  }
+  return allowed;
+}
+
 function detectCategory(title) {
   const t = (title || '').toLowerCase();
-  if (t.includes('watch') || t.includes('wrist'))         return 'Watches & Timepieces';
-  if (t.includes('glasses') || t.includes('frames') || t.includes('sunglasses') || t.includes('eyewear') || t.includes('spectacles') || t.includes('optical')) return 'Eyewear & Sunglasses';
+  if (t.includes('watch') || t.includes('wrist') || t.includes('timepiece') || t.includes('chronograph'))         return 'Watches & Timepieces';
+  if (t.includes('glasses') || t.includes('frames') || t.includes('sunglasses') || t.includes('eyewear') || t.includes('spectacles') || t.includes('optical') || t.includes('wayfarer') || t.includes('aviator') || t.includes('ray-ban') || t.includes('rayban')) return 'Eyewear & Sunglasses';
   var artTerms = ['painting','oil on','canvas','watercolor','watercolour','drawing','sketch','pastel','gouache','acrylic','serigraph','silkscreen','photograph','original art','mixed media','charcoal'];
   var printTerms = ['print','giclee','reproduction','poster','lithograph','offset'];
   if (artTerms.some(function(w){return t.includes(w);}) && !printTerms.some(function(w){return t.includes(w);})) return 'Art & Originals';
@@ -331,6 +402,7 @@ async function main() {
   log('Getting eBay OAuth token...');
   const token = await getToken(CLIENT_ID, CLIENT_SECRET);
   log('Token obtained ✓');
+  await debugItems(token);
 
   // Candidates = last run's eBay items + eBay rows in the sheet (+ collections if re-enabled)
   const prevItems = loadPreviousEbayItems();
@@ -366,6 +438,7 @@ async function main() {
   const BATCH_SIZE = 10;
   const ebayPinned = [];
   var soldCount = 0, keptCount = 0;
+  const availTally = {};
 
   for (var b = 0; b < pinnedIds.length; b += BATCH_SIZE) {
     const batch = pinnedIds.slice(b, b + BATCH_SIZE);
@@ -380,6 +453,9 @@ async function main() {
       var cand = candidates.get(id) || {};
       if (r.status === 'fulfilled') {
         var item = r.value;
+        var st0 = item && item.estimatedAvailabilities && item.estimatedAvailabilities[0];
+        var stKey = (st0 && st0.estimatedAvailabilityStatus) || 'NO_STATUS';
+        availTally[stKey] = (availTally[stKey] || 0) + 1;
         if (!isStillAvailable(item)) { soldCount++; log('    – Sold/ended, removed: ' + id); return; }
         if (!(item.image && item.image.imageUrl)) { log('    ✗ No image: ' + id); return; }
         var n = normalise(item, true);
@@ -403,6 +479,8 @@ async function main() {
 
     if (b + BATCH_SIZE < pinnedIds.length) await new Promise(function(r) { setTimeout(r, 500); });
   }
+
+  log('Availability statuses from eBay: ' + JSON.stringify(availTally));
 
   // Safety: never overwrite a healthy listings file with an empty result
   if (ebayPinned.length === 0 && Object.keys(prevItems).length > 20) {
@@ -437,7 +515,25 @@ async function main() {
         limit: query.limit,
         campaignId: CAMPAIGN_ID,
       });
-      const filtered = filterBatch(raw, query);
+      const passed = filterBatch(raw, query);
+      var filtered = passed.filter(function(it) { return isOnTopic(it.title); });
+      const dropped = passed.filter(function(it) { return !isOnTopic(it.title); });
+      const scope = scopeForQuery(query);
+      if (scope) {
+        const outOfScope = [];
+        filtered = filtered.filter(function(it) {
+          var cat = detectCategory(it.title);
+          if (scope.indexOf(cat) === -1) { outOfScope.push(it); return false; }
+          it.category = cat;
+          return true;
+        });
+        if (outOfScope.length) {
+          log('    outside seller scope (' + scope.join(' / ') + '): ' + outOfScope.length + ' e.g. ' + outOfScope.slice(0, 4).map(function(d) { return '"' + (d.title || '').substring(0, 45) + '"'; }).join(' | '));
+        }
+      }
+      if (dropped.length) {
+        log('    off-topic dropped: ' + dropped.length + ' e.g. ' + dropped.slice(0, 4).map(function(d) { return '"' + (d.title || '').substring(0, 45) + '"'; }).join(' | '));
+      }
       if (query.trusted) {
         for (var j = 0; j < filtered.length; j++) trustedScouted.push(filtered[j]);
       } else {
