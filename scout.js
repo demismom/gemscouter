@@ -18,15 +18,24 @@ const CLIENT_ID     = process.env.EBAY_CLIENT_ID;
 const CLIENT_SECRET = process.env.EBAY_CLIENT_SECRET;
 const CAMPAIGN_ID   = process.env.EBAY_CAMPAIGN_ID || '5339145706';
 
+// ── eBay collections (public URLs from the account you curate on) ──
+// Paste your new collection URL(s) here, e.g. 'https://www.ebay.com/inf/USERNAME/collections/123456789'
 const COLLECTION_URLS = [
-  'https://www.ebay.com/inf/gemscouter/collections/101331828749',
-  'https://www.ebay.com/inf/gemscouter/collections/103815643151',
+  // 'https://www.ebay.com/inf/NEWUSERNAME/collections/XXXXXXXXXXX',
 ];
 
-// Home decor collection — all items forced to Home Decor category
+// Optional: a separate collection whose items all go under the Home department
 const HOME_COLLECTION_URLS = [
-  'https://www.ebay.com/inf/gemscouter/collections/137907470350',
+  // 'https://www.ebay.com/inf/NEWUSERNAME/collections/XXXXXXXXXXX',
 ];
+
+const USE_COLLECTIONS = true;
+
+// While you rebuild your collection, keep the items already on the site.
+// When the new collection has everything you want, set this to false —
+// from then on the collection is the single source of truth (remove from it = removed from site).
+const CARRY_FORWARD = true;
+
 const SHEET_CSV_URL  = 'https://docs.google.com/spreadsheets/d/1R0PmBS_kJsgU8uvewGm8JHzLphEcUHwDQWraSAOwiFY/export?format=csv&gid=938314832';
 
 const FALLBACK_PINNED_IDS = [
@@ -49,6 +58,8 @@ async function fetchSheetListings() {
 
     // Skip header row
     const items = [];
+    const ebayRows = [];            // active eBay rows -> fetched fresh from the eBay API
+    const excludeIds = new Set();   // eBay item IDs marked sold / hidden / remove
     for (var i = 1; i < lines.length; i++) {
       // Parse CSV row (handle quoted fields)
       const cols = parseCSVRow(lines[i]);
@@ -63,6 +74,17 @@ async function fetchSheetListings() {
       const status       = (cols[7] || '').trim().toLowerCase();
       // col[8] = Notes (skip)
       const imageUrl     = (cols[9] || '').trim();
+
+      // eBay rows: Program = eBay, an ebay.com/itm URL, or a bare eBay item ID in column A
+      const isEbayRow = program.toLowerCase() === 'ebay' || /ebay\.com\/itm\//i.test(affiliateUrl) || /^(v1\|)?\d{12,13}(\|0)?$/.test(id);
+      if (isEbayRow) {
+        const ebayId = extractEbayId(id, affiliateUrl);
+        if (ebayId) {
+          if (status === 'active' || status === '') ebayRows.push({ id: ebayId, category: category, tags: tags });
+          else excludeIds.add(ebayId);
+          continue;
+        }
+      }
 
       // Only include active items with required fields
       if (!title || !affiliateUrl || status !== 'active') continue;
@@ -86,12 +108,47 @@ async function fetchSheetListings() {
       });
     }
 
-    log('  Found ' + items.length + ' active sheet listings');
-    return items;
+    log('  Found ' + items.length + ' affiliate listings, ' + ebayRows.length + ' eBay rows, ' + excludeIds.size + ' hidden/sold rows');
+    return { items: items, ebayRows: ebayRows, excludeIds: excludeIds };
   } catch (err) {
     log('  Sheet fetch failed: ' + err.message);
-    return [];
+    return { items: [], ebayRows: [], excludeIds: new Set() };
   }
+}
+
+function extractEbayId(idCell, url) {
+  var m = String(url || '').match(/\/itm\/(?:[^\/]*\/)?(\d{12,13})/);
+  if (m) return m[1];
+  m = String(idCell || '').match(/(\d{12,13})/);
+  return m ? m[1] : null;
+}
+
+// Items from the last successful run — used so existing listings carry forward
+// without needing an eBay collection, and as a safety net for temporary API errors.
+function loadPreviousEbayItems() {
+  try {
+    const data = JSON.parse(fs.readFileSync(OUT_FILE, 'utf8'));
+    const byId = {};
+    (data.pinned || []).forEach(function(it) {
+      if (it && it.source === 'eBay') {
+        var m = String(it.id).match(/(\d{12,13})/);
+        if (m) byId[m[1]] = it;
+      }
+    });
+    return byId;
+  } catch (e) { return {}; }
+}
+
+function isStillAvailable(item) {
+  if (!item) return false;
+  var avail = item.estimatedAvailabilities && item.estimatedAvailabilities[0];
+  if (avail && avail.estimatedAvailabilityStatus === 'OUT_OF_STOCK') return false;
+  if (item.itemEndDate && new Date(item.itemEndDate).getTime() < Date.now()) return false;
+  return true;
+}
+
+function isGoneError(err) {
+  return !!(err && err.message && /: (400|404|410)$/.test(err.message));
 }
 
 function parseCSVRow(row) {
@@ -139,8 +196,8 @@ async function fetchCollectionIds() {
     }
   }
   if (!allIds.length) {
-    log('  All collections failed — using fallback');
-    return FALLBACK_PINNED_IDS;
+    log('  No collection items found — continuing without them');
+    return [];
   }
   log('  Total from all collections: ' + allIds.length);
   return allIds;
@@ -209,6 +266,13 @@ function inferTags(title) {
   return [...new Set(tags)];
 }
 
+function withAffiliate(url, itemId) {
+  if (url && /campid=/.test(url)) return url;
+  var m = String(itemId || url || '').match(/(\d{12,13})/);
+  if (!m) return url;
+  return 'https://www.ebay.com/itm/' + m[1] + '?mkevt=1&mkcid=1&mkrid=711-53200-19255-0&campid=' + CAMPAIGN_ID + '&toolid=10050';
+}
+
 function normaliseHome(item) {
   const price = parseFloat(item.price && item.price.value ? item.price.value : 0);
   // Detect specific home sub-category, default to Home Decor
@@ -221,7 +285,7 @@ function normaliseHome(item) {
     price: price,
     priceFormatted: '$' + price.toFixed(2),
     imageUrl: item.image && item.image.imageUrl ? item.image.imageUrl : null,
-    affiliateUrl: item.itemAffiliateWebUrl || item.itemWebUrl,
+    affiliateUrl: withAffiliate(item.itemAffiliateWebUrl || item.itemWebUrl, item.itemId),
     condition: item.condition || 'Pre-owned',
     source: 'eBay',
     category: cat,
@@ -241,7 +305,7 @@ function normalise(item, pinned) {
     price: price,
     priceFormatted: '$' + price.toFixed(2),
     imageUrl: item.image && item.image.imageUrl ? item.image.imageUrl : null,
-    affiliateUrl: item.itemAffiliateWebUrl || item.itemWebUrl,
+    affiliateUrl: withAffiliate(item.itemAffiliateWebUrl || item.itemWebUrl, item.itemId),
     condition: item.condition || 'Pre-owned',
     source: 'eBay',
     category: detectCategory(item.title),
@@ -260,79 +324,97 @@ async function main() {
   }
 
   // ── Source 1: Google Sheet ────────────────────────────
-  const sheetListings = await fetchSheetListings();
+  const sheet = await fetchSheetListings();
+  const sheetListings = sheet.items;
 
   // ── Source 2: eBay collection ─────────────────────────
   log('Getting eBay OAuth token...');
   const token = await getToken(CLIENT_ID, CLIENT_SECRET);
   log('Token obtained ✓');
 
-  const pinnedIds = await fetchCollectionIds();
-  log('Fetching ' + pinnedIds.length + ' pinned items from API (batches of 10)...');
+  // Candidates = last run's eBay items + eBay rows in the sheet (+ collections if re-enabled)
+  const prevItems = loadPreviousEbayItems();
+  const candidates = new Map();   // id -> { category, tags }
+  if (CARRY_FORWARD) {
+    Object.keys(prevItems).forEach(function(id) { candidates.set(id, { category: prevItems[id].category || null, tags: [] }); });
+  }
+  sheet.ebayRows.forEach(function(r) {
+    var existing = candidates.get(r.id) || {};
+    candidates.set(r.id, {
+      category: r.category || existing.category || null,
+      tags: r.tags ? r.tags.split(',').map(function(t) { return t.trim(); }).filter(Boolean) : [],
+    });
+  });
+  if (USE_COLLECTIONS) {
+    const mainIds = await fetchCollectionIds();
+    const homeIds = await fetchHomeCollectionIds();
+    mainIds.forEach(function(id) {
+      var prior = candidates.get(id) || {};
+      candidates.set(id, { category: prior.category || (prevItems[id] && prevItems[id].category) || null, tags: [] });
+    });
+    homeIds.forEach(function(id) {
+      var prior = candidates.get(id) || {};
+      candidates.set(id, { category: prior.category || (prevItems[id] && prevItems[id].category) || null, tags: [], homeDefault: true });
+    });
+  }
+  sheet.excludeIds.forEach(function(id) { candidates.delete(id); });
 
-  // Fetch in batches of 10 to avoid overwhelming the connection pool
+  const pinnedIds = Array.from(candidates.keys());
+  log('Checking ' + pinnedIds.length + ' eBay items (carry-forward ' + (CARRY_FORWARD ? 'on' : 'off') + ', ' + sheet.ebayRows.length + ' from sheet)...');
+
+  const HOME_CATS = ['Art & Originals', 'Home Decor', 'Ceramics & Pottery', 'Barware & Silver'];
   const BATCH_SIZE = 10;
   const ebayPinned = [];
+  var soldCount = 0, keptCount = 0;
+
   for (var b = 0; b < pinnedIds.length; b += BATCH_SIZE) {
     const batch = pinnedIds.slice(b, b + BATCH_SIZE);
-    const batchNum = Math.floor(b / BATCH_SIZE) + 1;
-    const totalBatches = Math.ceil(pinnedIds.length / BATCH_SIZE);
-    log('  Batch ' + batchNum + '/' + totalBatches + ' (' + batch.length + ' items)...');
+    log('  Batch ' + (Math.floor(b / BATCH_SIZE) + 1) + '/' + Math.ceil(pinnedIds.length / BATCH_SIZE) + ' (' + batch.length + ' items)...');
 
     const results = await Promise.allSettled(
       batch.map(function(id) { return getItem(id, token, CAMPAIGN_ID); })
     );
 
     results.forEach(function(r, i) {
-      if (r.status === 'fulfilled' && r.value && r.value.image && r.value.image.imageUrl) {
-        ebayPinned.push(normalise(r.value, true));
+      var id = batch[i];
+      var cand = candidates.get(id) || {};
+      if (r.status === 'fulfilled') {
+        var item = r.value;
+        if (!isStillAvailable(item)) { soldCount++; log('    – Sold/ended, removed: ' + id); return; }
+        if (!(item.image && item.image.imageUrl)) { log('    ✗ No image: ' + id); return; }
+        var n = normalise(item, true);
+        if (cand.category) n.category = cand.category;
+        if (cand.homeDefault && HOME_CATS.indexOf(n.category) === -1) n.category = 'Home Decor';
+        if (HOME_CATS.indexOf(n.category) !== -1) n.tags = n.tags.concat(['home', 'vintage decor']);
+        if (cand.tags && cand.tags.length) n.tags = Array.from(new Set(n.tags.concat(cand.tags)));
+        ebayPinned.push(n);
+      } else if (isGoneError(r.reason)) {
+        soldCount++;
+        log('    – Listing gone, removed: ' + id);
+      } else if (prevItems[id]) {
+        // Temporary problem (network / rate limit) — keep the last known copy rather than dropping it
+        keptCount++;
+        ebayPinned.push(prevItems[id]);
+        log('    ! Could not verify ' + id + ' (' + (r.reason && r.reason.message) + ') — kept from last run');
       } else {
-        var reason = r.reason && r.reason.message ? r.reason.message : 'no image';
-        log('    ✗ Item ' + batch[i] + ': ' + reason);
+        log('    ✗ Item ' + id + ': ' + (r.reason && r.reason.message));
       }
     });
 
-    // Small pause between batches to be kind to the API
-    if (b + BATCH_SIZE < pinnedIds.length) {
-      await new Promise(function(r) { setTimeout(r, 500); });
-    }
+    if (b + BATCH_SIZE < pinnedIds.length) await new Promise(function(r) { setTimeout(r, 500); });
   }
 
-  log('eBay pinned: ' + ebayPinned.length + '/' + pinnedIds.length + ' fetched ✓');
-
-  // ── Source 2b: Home collection ───────────────────────
-  const homeIds = await fetchHomeCollectionIds();
-  log('Fetching ' + homeIds.length + ' home items from API (batches of 10)...');
-
-  const homePinned = [];
-  for (var h = 0; h < homeIds.length; h += BATCH_SIZE) {
-    const batch = homeIds.slice(h, h + BATCH_SIZE);
-    const batchNum = Math.floor(h / BATCH_SIZE) + 1;
-    const totalBatches = Math.ceil(homeIds.length / BATCH_SIZE);
-    log('  Home batch ' + batchNum + '/' + totalBatches + ' (' + batch.length + ' items)...');
-
-    const results = await Promise.allSettled(
-      batch.map(function(id) { return getItem(id, token, CAMPAIGN_ID); })
-    );
-
-    results.forEach(function(r, i) {
-      if (r.status === 'fulfilled' && r.value && r.value.image && r.value.image.imageUrl) {
-        homePinned.push(normaliseHome(r.value));
-      } else {
-        var reason = r.reason && r.reason.message ? r.reason.message : 'no image';
-        log('    ✗ Home item ' + batch[i] + ': ' + reason);
-      }
-    });
-
-    if (h + BATCH_SIZE < homeIds.length) {
-      await new Promise(function(r) { setTimeout(r, 500); });
-    }
+  // Safety: never overwrite a healthy listings file with an empty result
+  if (ebayPinned.length === 0 && Object.keys(prevItems).length > 20) {
+    console.error('ABORT: 0 eBay items survived but ' + Object.keys(prevItems).length + ' existed last run. Not overwriting listings.json.');
+    process.exit(1);
   }
-  log('Home pinned: ' + homePinned.length + '/' + homeIds.length + ' fetched ✓');
 
-  // Merge all pinned — sheet first, then eBay accessories, then eBay home
-  const allPinned = sheetListings.concat(ebayPinned).concat(homePinned);
-  log('Total pinned: ' + allPinned.length + ' (' + sheetListings.length + ' sheet + ' + ebayPinned.length + ' eBay + ' + homePinned.length + ' home)');
+  const homePinned = ebayPinned.filter(function(i) { return HOME_CATS.indexOf(i.category) !== -1; });
+  log('eBay items: ' + ebayPinned.length + ' live, ' + soldCount + ' removed (sold/ended), ' + keptCount + ' kept after temporary errors');
+
+  const allPinned = sheetListings.concat(ebayPinned);
+  log('Total pinned: ' + allPinned.length + ' (' + sheetListings.length + ' affiliate sheet + ' + ebayPinned.length + ' eBay)');
 
   // ── Source 3: eBay scout ──────────────────────────────
   log('\nRunning category scouts...');
@@ -384,7 +466,7 @@ async function main() {
   fs.mkdirSync(path.dirname(OUT_FILE), { recursive: true });
   fs.writeFileSync(OUT_FILE, JSON.stringify(output, null, 2));
   log('\n✓ Done — ' + allPinned.length + ' pinned + ' + allScouted.length + ' scouted = ' + output.total + ' total gems');
-  log('  Sheet: ' + sheetListings.length + ' | eBay accessories: ' + ebayPinned.length + ' | Home: ' + homePinned.length + ' | Trusted: ' + trustedScouted.length + ' | Broad: ' + broadScouted.length);
+  log('  Affiliate sheet: ' + sheetListings.length + ' | eBay: ' + ebayPinned.length + ' (home: ' + homePinned.length + ') | Trusted: ' + trustedScouted.length + ' | Broad: ' + broadScouted.length);
 }
 
 main().catch(function(err) {
