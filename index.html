@@ -434,20 +434,41 @@ function dedupeItems(items) {
   });
 }
 
-function shuffleMix(items) {
+function seededRand(seed) {
+  var s = seed >>> 0;
+  return function() { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; };
+}
+function fisherYates(arr, rand) {
+  for (var i = arr.length - 1; i > 0; i--) {
+    var j = Math.floor(rand() * (i + 1));
+    var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+  }
+  return arr;
+}
+function interleaveByCat(items) {
   var byCategory = {};
   items.forEach(function(item) {
     var cat = item.category || 'other';
-    if (!byCategory[cat]) byCategory[cat] = [];
-    byCategory[cat].push(item);
+    (byCategory[cat] = byCategory[cat] || []).push(item);
   });
   var cats = Object.values(byCategory);
   var mixed = [];
-  var maxLen = Math.max.apply(null, cats.map(function(c) { return c.length; }));
+  var maxLen = Math.max.apply(null, cats.map(function(c) { return c.length; }).concat([0]));
   for (var i = 0; i < maxLen; i++) {
     cats.forEach(function(cat) { if (cat[i]) mixed.push(cat[i]); });
   }
   return mixed;
+}
+// New arrivals (added in last 14 days) first, newest first; everything else shuffled (reseeds every 6 hours)
+function shuffleMix(items) {
+  var rand = seededRand(Math.floor(Date.now() / (6 * 3600000)));
+  var cutoff = Date.now() - 14 * 86400000;
+  function added(i) { return i.addedAt ? Date.parse(i.addedAt) : 0; }
+  var fresh = items.filter(function(i) { return added(i) >= cutoff; })
+                   .sort(function(a, b) { return added(b) - added(a); });
+  var rest = items.filter(function(i) { return added(i) < cutoff; });
+  fisherYates(rest, rand);
+  return fresh.concat(interleaveByCat(rest));
 }
 
 function renderGrid() {
