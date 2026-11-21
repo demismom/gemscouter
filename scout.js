@@ -482,6 +482,14 @@ async function main() {
 
   log('Availability statuses from eBay: ' + JSON.stringify(availTally));
 
+  // Stamp when each item was first seen so the site can feature new arrivals.
+  // Items already on the site before this field existed get an old date (so only genuinely new ones count as new).
+  var nowIso = new Date().toISOString();
+  ebayPinned.forEach(function(it) {
+    var prev = prevItems[it.id];
+    it.addedAt = (prev && prev.addedAt) || (prev ? '2000-01-01T00:00:00.000Z' : nowIso);
+  });
+
   // Safety: never overwrite a healthy listings file with an empty result
   if (ebayPinned.length === 0 && Object.keys(prevItems).length > 20) {
     console.error('ABORT: 0 eBay items survived but ' + Object.keys(prevItems).length + ' existed last run. Not overwriting listings.json.');
