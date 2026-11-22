@@ -303,6 +303,24 @@ function scopeForQuery(query) {
   return allowed;
 }
 
+// Turn whatever is typed in the sheet's Category column into a real site category.
+// "Home" / "Decor" etc. -> Home Decor; exact names (any case) accepted; anything else ignored.
+const VALID_CATS = ['Jewelry & Accessories', 'Watches & Timepieces', 'Eyewear & Sunglasses',
+                    'Art & Originals', 'Home Decor', 'Ceramics & Pottery', 'Barware & Silver'];
+function normaliseCategory(raw) {
+  var c = String(raw || '').trim().toLowerCase();
+  if (!c) return null;
+  for (var i = 0; i < VALID_CATS.length; i++) if (VALID_CATS[i].toLowerCase() === c) return VALID_CATS[i];
+  if (/^(home|decor|home decor|home & decor|home goods|housewares)$/.test(c)) return 'Home Decor';
+  if (/^(art|artwork|painting|paintings|prints?)$/.test(c)) return 'Art & Originals';
+  if (/^(ceramics?|pottery|porcelain|china)$/.test(c)) return 'Ceramics & Pottery';
+  if (/^(barware|silver|silverware|bar)$/.test(c)) return 'Barware & Silver';
+  if (/^(jewelry|jewellery|accessories)$/.test(c)) return 'Jewelry & Accessories';
+  if (/^(watch|watches)$/.test(c)) return 'Watches & Timepieces';
+  if (/^(eyewear|sunglasses|glasses)$/.test(c)) return 'Eyewear & Sunglasses';
+  return null;
+}
+
 function detectCategory(title) {
   const t = (title || '').toLowerCase();
   if (t.includes('watch') || t.includes('wrist') || t.includes('timepiece') || t.includes('chronograph'))         return 'Watches & Timepieces';
@@ -459,7 +477,10 @@ async function main() {
         if (!isStillAvailable(item)) { soldCount++; log('    – Sold/ended, removed: ' + id); return; }
         if (!(item.image && item.image.imageUrl)) { log('    ✗ No image: ' + id); return; }
         var n = normalise(item, true);
-        if (cand.category) n.category = cand.category;
+        if (cand.category) {
+          var norm = normaliseCategory(cand.category);
+          if (norm) n.category = norm;           // unknown/blank value -> keep auto-detected category
+        }
         if (cand.homeDefault && HOME_CATS.indexOf(n.category) === -1) n.category = 'Home Decor';
         if (HOME_CATS.indexOf(n.category) !== -1) n.tags = n.tags.concat(['home', 'vintage decor']);
         if (cand.tags && cand.tags.length) n.tags = Array.from(new Set(n.tags.concat(cand.tags)));
