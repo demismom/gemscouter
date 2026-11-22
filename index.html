@@ -459,16 +459,14 @@ function interleaveByCat(items) {
   }
   return mixed;
 }
-// New arrivals (added in last 14 days) first, newest first; everything else shuffled (reseeds every 6 hours)
+// Pure random order: hand-picked first (shuffled), then everything else (shuffled).
+// No date, price or category ordering. New shuffle on every page load (stable while filtering).
+var SHUFFLE_SEED = Math.floor(Math.random() * 4294967296);
 function shuffleMix(items) {
-  var rand = seededRand(Math.floor(Date.now() / (6 * 3600000)));
-  var cutoff = Date.now() - 14 * 86400000;
-  function added(i) { return i.addedAt ? Date.parse(i.addedAt) : 0; }
-  var fresh = items.filter(function(i) { return added(i) >= cutoff; })
-                   .sort(function(a, b) { return added(b) - added(a); });
-  var rest = items.filter(function(i) { return added(i) < cutoff; });
-  fisherYates(rest, rand);
-  return fresh.concat(interleaveByCat(rest));
+  var rand = seededRand(SHUFFLE_SEED);
+  var pinned = items.filter(function(i) { return i.pinned; });
+  var others = items.filter(function(i) { return !i.pinned; });
+  return fisherYates(pinned, rand).concat(fisherYates(others, rand));
 }
 
 function renderGrid() {
